@@ -31,7 +31,8 @@ var api = require("./routes/routes");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/emailTemplates/index.html");
+  // res.sendFile(__dirname + "/emailTemplates/index.html");
+  res.send("e-commerce project of qubi")
 });
 app.use(
   response.ok,
