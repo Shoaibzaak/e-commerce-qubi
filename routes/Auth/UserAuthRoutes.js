@@ -51,5 +51,7 @@ router
 //   ]),
 //   Controller.AuthController.setupProfile
 // );
+router.route("/registerAdmin").post(Controller.UserAuthController.registerAdmin);
+router.route("/loginAdmin").post(Controller.UserAuthController.loginAdmin);
 
 module.exports = router;

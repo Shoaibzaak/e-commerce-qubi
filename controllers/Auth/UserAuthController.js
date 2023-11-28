@@ -308,4 +308,85 @@ module.exports = {
       }
     });
   }),
+  registerAdmin: async (req, res, next) => {
+    try {
+      const { firstName, lastName, email, password } = req.body;
+      // Email validation
+      if (!Validation.validateEmail(email)) {
+        return res.badRequest("Invalid email format");
+      }
+
+      const isValidate = await validatePassword({ password });
+      if (!isValidate) return res.badRequest(Message.passwordTooWeak);
+      const hash = encrypt.hashSync(password, 10);
+      // const otp = otpService.issue();
+      // const otpExpiry = moment().add(10, "minutes").valueOf();
+      const verifyEmail = await Model.Admin.findOne({ email });
+      if (verifyEmail)
+        throw new HTTPError(Status.BAD_REQUEST, Message.emailAlreadyExists);
+      const User = new Model.Admin({
+        firstName,
+        lastName,
+        email,
+        password: hash,
+      });
+
+      // Delete unverified users who has register 24 hours before
+      // await Model.Admin.deleteMany({isEmailConfirmed: false, createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } });
+      await User.save();
+      // let otpCode = {
+      //   otp,
+      // };
+      // await Services.EmailService.sendEmail(
+      //   "public/otpVerification.html",
+      //   otpCode,
+      //   email,
+      //   "User Account Email Verification | vagabond"
+      // );
+      return res.ok(
+        "Admin Registred successfully.",
+        User
+      );
+    } catch (err) {
+      next(err);
+    }
+  },
+  loginAdmin: async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password)
+        throw new HTTPError(Status.BAD_REQUEST, Message.required);
+      // Email validation
+      if (!Validation.validateEmail(email)) {
+        return res.badRequest("Invalid email format");
+      }
+      let user;
+      user = await Model.Admin.findOne({ email });
+      if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
+      // if (user.isEmailConfirmed == true) {
+        encrypt.compare(password, user.password, async (err, match) => {
+          if (match) {
+            await Model.Admin.findOneAndUpdate(
+              { _id: user._id },
+            );
+            const token = `GHA ${Services.JwtService.issue({
+              id: Services.HashService.encrypt(user._id),
+            })}`;
+            return res.ok("Log in successfully", {
+              token,
+              user,
+            });
+          } else {
+            return res.badRequest("Invalid Credentials");
+          }
+        });
+      // } 
+      // else {
+      //   return res.badRequest("User Not Verified");
+      // }
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  },
 };
