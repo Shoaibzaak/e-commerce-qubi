@@ -7,7 +7,7 @@ const Authentication = require("../policy/index");
 
 const userStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./public");
+    cb(null, "/tmp");
   },
   filename: (req, file, cb) => {
     cb(

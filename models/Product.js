@@ -25,6 +25,9 @@ const productModel = new Schema(
     price: {
       type: Number,
     },
+    productRate: {
+      type: Number,
+    },
     quantity: {
       type: Number,
     },
@@ -32,8 +35,8 @@ const productModel = new Schema(
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "category",
     // },
-    type:{
-     type:String
+    type: {
+      type: String,
     },
     color: {
       type: String,
@@ -54,7 +57,7 @@ const productModel = new Schema(
     status: {
       type: String,
       enum: ["Cancelled", "Shipped", "Processing"],
-      default:"Processing"
+      default: "Processing",
     },
     isDeleted: {
       type: Boolean,
