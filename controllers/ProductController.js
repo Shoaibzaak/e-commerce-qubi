@@ -16,7 +16,7 @@ const encrypt = require("bcrypt");
 const FormData = require("form-data");
 const catchAsync = require("../utils/catchAsync");
 const getDistance = require("../utils/getDistance");
-
+const cloudUpload = require('../cloudinary')
 const pushRepository = require("./pushController");
 const pushRepo = new pushRepository();
 
@@ -50,13 +50,22 @@ module.exports = {
     try {
       var ProductData = req.body;
       ProductData.images = [];
-      if (Array.isArray(req.files.images)) {
-        for (let i = 0; i < req.files.images.length; i++) {
-          ProductData.images.push(
-            `public/images/${req.files.images[i].originalname}`
-          );
-        }
-      }
+      // if (Array.isArray(req.files.images)) {
+      //   for (let i = 0; i < req.files.images.length; i++) {
+      //     ProductData.images.push(
+      //       `public/images/${req.files.images[i].originalname}`
+      //     );
+      //   }
+      // }
+       if (Array.isArray(req.files.images)) {
+            for (let i = 0; i < req.files.images.length; i++) {
+                const newPath = await cloudinary.uploader.upload(req.files.images[i].originalname,(result)=>{
+                })
+                console.log(newPath, "newPath")
+                PinData.images.push(newPath)
+
+            }
+            }
       var result = await ProductHelper.createProduct(ProductData);
 
       var message = "Product created successfully";
