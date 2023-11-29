@@ -1,6 +1,7 @@
 module.exports = {
   User: require("./User"),
-  Family:require('./family'),
+  Product:require('./Product'),
   Admin: require("./Admin"),
+  Category: require("./Category"),
  
 };
