@@ -369,7 +369,7 @@ module.exports = {
             await Model.Admin.findOneAndUpdate(
               { _id: user._id },
             );
-            const token = `GHA ${Services.JwtService.issue({
+            const token = `${Services.JwtService.issue({
               id: Services.HashService.encrypt(user._id),
             })}`;
             return res.ok("Log in successfully", {
