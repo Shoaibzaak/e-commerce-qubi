@@ -49,6 +49,7 @@ module.exports = {
     console.log("createProduct is called");
     try {
       var ProductData = req.body;
+      const files = req.files.images
       ProductData.images = [];
       // if (Array.isArray(req.files.images)) {
       //   for (let i = 0; i < req.files.images.length; i++) {
@@ -57,15 +58,14 @@ module.exports = {
       //     );
       //   }
       // }
-       if (Array.isArray(req.files.images)) {
-            for (let i = 0; i < req.files.images.length; i++) {
-                const newPath = await cloudinary.uploader.upload(req.files.images[i].originalname,(result)=>{
-                })
-                console.log(newPath, "newPath")
-                PinData.images.push(newPath)
+      if (req.files.images) {
+        for (const file of files) {
+            const { path } = file
+            const newPath = await cloudUpload.cloudinaryUpload(path)
+            ProductData.images.push(newPath)
 
-            }
-            }
+        }
+    }
       var result = await ProductHelper.createProduct(ProductData);
 
       var message = "Product created successfully";
