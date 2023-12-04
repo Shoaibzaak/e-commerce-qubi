@@ -16,7 +16,7 @@ const encrypt = require("bcrypt");
 const FormData = require("form-data");
 const catchAsync = require("../utils/catchAsync");
 const getDistance = require("../utils/getDistance");
-const cloudUpload = require('../cloudinary')
+const cloudUpload = require("../cloudinary");
 const pushRepository = require("./pushController");
 const pushRepo = new pushRepository();
 
@@ -49,7 +49,7 @@ module.exports = {
     console.log("createProduct is called");
     try {
       var ProductData = req.body;
-      const files = req.files.images
+      const files = req.files.images;
       ProductData.images = [];
       // if (Array.isArray(req.files.images)) {
       //   for (let i = 0; i < req.files.images.length; i++) {
@@ -60,12 +60,11 @@ module.exports = {
       // }
       if (req.files.images) {
         for (const file of files) {
-            const { path } = file
-            const newPath = await cloudUpload.cloudinaryUpload(path)
-            ProductData.images.push(newPath)
-
+          const { path } = file;
+          const newPath = await cloudUpload.cloudinaryUpload(path);
+          ProductData.images.push(newPath);
         }
-    }
+      }
       var result = await ProductHelper.createProduct(ProductData);
 
       var message = "Product created successfully";
@@ -134,6 +133,15 @@ module.exports = {
   updateProduct: catchAsync(async (req, res, next) => {
     // Get the Product user data from the request body
     var ProductUserData = req.body;
+    const files = req.files.images;
+    ProductUserData.images = [];
+    if (req.files.images) {
+      for (const file of files) {
+        const { path } = file;
+        const newPath = await cloudUpload.cloudinaryUpload(path);
+        ProductUserData.images.push(newPath);
+      }
+    }
     try {
       // Update the Product user with the updated data
       var result = await Model.Product.findOneAndUpdate(
@@ -143,6 +151,7 @@ module.exports = {
           new: true,
         }
       );
+      // console.log(result,'result====>')
       var message = "Product  status updated successfully";
       res.ok(message, result);
     } catch (err) {

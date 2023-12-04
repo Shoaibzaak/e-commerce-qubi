@@ -31,7 +31,7 @@ var upload = multer({ //multer settings
   }
 })
 
-//post custom Family 
+//post custom Product 
 router.route("/createProduct").post(
   upload.fields([
     {
@@ -42,26 +42,32 @@ router.route("/createProduct").post(
   // Authentication.UserAuth,
   Controller.ProductController.createProduct);
 
-//update Family
-router.route("/updateFamily").post(
-  Authentication.UserAuth,
-  Controller.FamilyController.updateFamily);
+//update Product
+router.route("/updateProduct").post(
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 10,
+    },
+  ]),
+  // Authentication.UserAuth,
+  Controller.ProductController.updateProduct);
 
-//delete Family
-router.route("/deleteFamily/:id").delete(
-  Authentication.UserAuth,
-  Controller.FamilyController.declineFamily);
+//delete Product
+router.route("/deleteProduct/:id").delete(
+  // Authentication.UserAuth,
+  Controller.ProductController.declineProduct);
 
 
-// get Family by id
-router.route("/findFamilyById/:id").get(
-  Authentication.UserAuth,
-  Controller.FamilyController.getFamilyUser);
+// get Product by id
+router.route("/findProductById/:id").get(
+  // Authentication.UserAuth,
+  Controller.ProductController.getProductUser);
 
-  // get all  Familys with details
-router.route("/getAllFamilies").post(
-  Authentication.UserAuth,
-  Controller.FamilyController.getAllFamilyUsers);
+  // get all  Products with details
+router.route("/getAllProducts").get(
+  // Authentication.UserAuth,
+  Controller.ProductController.getAllProductUsers);
 
 
 
