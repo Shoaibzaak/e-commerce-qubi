@@ -110,13 +110,13 @@ module.exports = {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
       var message = "Productdetails found successfully";
-      var Families = await Model.Product.find()
+      var products = await Model.Product.find()
         .skip(pageNumber * limit - limit)
         .limit(limit)
-        .sort("-_id");
-      const ProductSize = Families.length;
+        .sort("_id");
+      const ProductSize = products.length;
       const result = {
-        Product: Families,
+        Product: products,
         count: ProductSize,
         limit: limit,
       };
