@@ -163,7 +163,7 @@ module.exports = {
   declineProduct: catchAsync(async (req, res, next) => {
     var ProductId = req.params.id;
     try {
-      const ProductUser = await Model.Product.findOneAndDelete(ProductId);
+      const ProductUser = await Model.Product.findByIdAndDelete(ProductId);
       if (!ProductUser)
         return res.badRequest("Product  Not Found in our records");
       var message = "Product user deleted successfully";
