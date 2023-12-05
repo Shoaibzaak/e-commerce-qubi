@@ -47,7 +47,7 @@ module.exports = {
     findProductById: async (query) => {
         console.log("findProductById HelperFunction is called", query);
 
-        const Product= await Model.Product.findOne(query.critarion)
+        const Product= await Model.Product.findById(query.critarion)
         // .populate({
         //     path: 'ProductSubscription', populate: {
         //         path: "subscriptionId"
