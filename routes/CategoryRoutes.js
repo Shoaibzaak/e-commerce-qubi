@@ -39,7 +39,7 @@ router.route("/createCategory").post(
 //       maxCount: 10,
 //     },
 //   ]),
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   Controller.CategoryController.createCategory);
 
 //update Family
@@ -60,7 +60,7 @@ router.route("/findFamilyById/:id").get(
 
   // get all  Familys with details
 router.route("/getAllCategories").get(
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   Controller.CategoryController.getAllCategoryUsers);
 
 
