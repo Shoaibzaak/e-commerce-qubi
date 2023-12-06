@@ -59,9 +59,9 @@ router.route("/findFamilyById/:id").get(
   Controller.FamilyController.getFamilyUser);
 
   // get all  Familys with details
-router.route("/getAllFamilies").post(
+router.route("/getAllCategories").get(
   Authentication.UserAuth,
-  Controller.FamilyController.getAllFamilyUsers);
+  Controller.CategoryController.getAllCategoryUsers);
 
 
 

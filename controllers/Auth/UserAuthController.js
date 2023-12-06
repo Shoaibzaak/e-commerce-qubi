@@ -351,41 +351,79 @@ module.exports = {
       next(err);
     }
   },
+  // loginAdmin: async (req, res, next) => {
+  //   try {
+  //     const { email, password } = req.body;
+  //     if (!email || !password)
+  //       throw new HTTPError(Status.BAD_REQUEST, Message.required);
+  //     // Email validation
+  //     if (!Validation.validateEmail(email)) {
+  //       return res.badRequest("Invalid email format");
+  //     }
+  //     let user;
+  //     user = await Model.Admin.findOne({ email });
+  //     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
+  //     // if (user.isEmailConfirmed == true) {
+  //       encrypt.compare(password, user.password, async (err, match) => {
+  //         if (match) {
+  //           await Model.Admin.findOneAndUpdate(
+  //             { _id: user._id },
+  //           );
+  //           const token = `${Services.JwtService.issue({
+  //             id: Services.HashService.encrypt(user._id),
+  //           })}`;
+  //           return res.ok("Log in successfully", {
+  //             token,
+  //             user,
+  //           });
+  //         } else {
+  //           return res.badRequest("Invalid Credentials");
+  //         }
+  //       });
+  //     // } 
+  //     // else {
+  //     //   return res.badRequest("User Not Verified");
+  //     // }
+  //   } catch (err) {
+  //     console.log(err);
+  //     next(err);
+  //   }
+  // },
   loginAdmin: async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      if (!email || !password)
+  
+      if (!email || !password) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
-      // Email validation
+      }
+  
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
       }
-      let user;
-      user = await Model.Admin.findOne({ email });
-      if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
-      // if (user.isEmailConfirmed == true) {
-        encrypt.compare(password, user.password, async (err, match) => {
-          if (match) {
-            await Model.Admin.findOneAndUpdate(
-              { _id: user._id },
-            );
-            const token = `${Services.JwtService.issue({
-              id: Services.HashService.encrypt(user._id),
-            })}`;
-            return res.ok("Log in successfully", {
-              token,
-              user,
-            });
-          } else {
-            return res.badRequest("Invalid Credentials");
-          }
+  
+      let user = await Model.Admin.findOne({ email });
+  
+      if (!user) {
+        throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
+      }
+  
+      const match = await bcrypt.compare(password, user.password);
+  
+      if (match) {
+        await Model.Admin.findOneAndUpdate({ _id: user._id });
+        const token = Services.JwtService.issue({
+          id: Services.HashService.encrypt(user._id),
         });
-      // } 
-      // else {
-      //   return res.badRequest("User Not Verified");
-      // }
+  
+        return res.ok("Log in successfully", {
+          token,
+          user,
+        });
+      } else {
+        return res.badRequest("Invalid Credentials");
+      }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       next(err);
     }
   },
