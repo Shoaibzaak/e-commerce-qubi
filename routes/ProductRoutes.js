@@ -67,7 +67,7 @@ router.route("/findProductById/:id").get(
   // get Product by id
 router.route("/findProductUserById/:id").get(
   // Authentication.UserAuth,
-  Controller.ProductController.getAllProductUser);
+  Controller.ProductController.getProductUser);
 
   // get all  Products with details
 router.route("/getAllProducts").get(
