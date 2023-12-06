@@ -8,7 +8,7 @@ const HTTPError = require("../../utils/CustomError");
 const moment = require("moment");
 const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
-const encrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
 
 module.exports = {
