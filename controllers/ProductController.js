@@ -25,6 +25,25 @@ const SANDBOX_CLIENT_SDK_ID = "bbb23e67-b04c-4075-97f2-105c4559d46c";
 
 module.exports = {
   // Retrieve Product user by ProductId
+  getProductAdmin: catchAsync(async (req, res, next) => {
+    console.log("findProductById is called");
+    try {
+      var ProductId = req.params.id;
+      console.log(ProductId);
+
+      var result = await ProductHelper.findProductById(ProductId);
+
+      var message = "ProductId found successfully";
+      if (result == null) {
+        message = "ProductId does not exist.";
+      }
+
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      responseHelper.requestfailure(res, error);
+    }
+  }),
+  // Retrieve Product user by ProductId
   getProductUser: catchAsync(async (req, res, next) => {
     console.log("findProductById is called");
     try {
@@ -43,7 +62,6 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
-
   // Create a new Product
   createProduct: catchAsync(async (req, res, next) => {
     console.log("createProduct is called");
@@ -101,7 +119,7 @@ module.exports = {
   },
 
   // Get all Product users with full details
-  getAllProductUsers: catchAsync(async (req, res, next) => {
+  getAllProductAdmin: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
     try {
       // var ProductData = req.body;
@@ -113,7 +131,9 @@ module.exports = {
       var products = await Model.Product.find()
         .skip(pageNumber * limit - limit)
         .limit(limit)
-        .sort("_id");
+        .sort("_id")
+        .populate('type')
+        ;
       const ProductSize = products.length;
       const result = {
         Product: products,
@@ -128,7 +148,36 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
+ // Get all Product users with full details
+ getAllProductUser: catchAsync(async (req, res, next) => {
+  console.log("Productdetails is called");
+  try {
+    // var ProductData = req.body;
 
+    // var result = await ProductHelper.getProductWithFullDetails(ProductData.sortproperty, ProductData.sortorder, ProductData.offset, ProductData.limit, ProductData.query);
+    const pageNumber = parseInt(req.query.pageNumber) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    var message = "Productdetails found successfully";
+    var products = await Model.Product.find()
+      .skip(pageNumber * limit - limit)
+      .limit(limit)
+      .sort("_id")
+      .populate('type')
+      ;
+    const ProductSize = products.length;
+    const result = {
+      Product: products,
+      count: ProductSize,
+      limit: limit,
+    };
+    if (result == null) {
+      message = "Productdetails does not exist.";
+    }
+    return responseHelper.success(res, result, message);
+  } catch (error) {
+    responseHelper.requestfailure(res, error);
+  }
+}),
   // Update a Product user
   updateProduct: catchAsync(async (req, res, next) => {
     // Get the Product user data from the request body

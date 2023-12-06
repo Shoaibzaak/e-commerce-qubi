@@ -31,13 +31,13 @@ const productModel = new Schema(
     quantity: {
       type: Number,
     },
-    // type: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "category",
-    // },
     type: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "category",
     },
+    // type: {
+    //   type: String,
+    // },
     color: {
       type: String,
     },

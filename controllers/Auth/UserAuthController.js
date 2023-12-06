@@ -38,7 +38,10 @@ module.exports = {
       });
 
       // Delete unverified users who has register 24 hours before
-      await Model.User.deleteMany({isEmailConfirmed: false, createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } });
+      await Model.User.deleteMany({
+        isEmailConfirmed: false,
+        createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      });
       await User.save();
       let otpCode = {
         otp,
@@ -132,7 +135,7 @@ module.exports = {
     };
     return res.ok("Account verified successfully", userData);
   }),
- //resend otp to email
+  //resend otp to email
   resendOtp: catchAsync(async (req, res, next) => {
     const { email } = req.body;
     if (!email) throw new HTTPError(Status.BAD_REQUEST, Message.required);
@@ -260,16 +263,16 @@ module.exports = {
 
   changePassword: catchAsync(async (req, res, next) => {
     // this user get from authenticated user
-    const verifiedUser=req.user
-    const {currentPassword, newPassword } = req.body;
-    if (  !currentPassword || !newPassword)
+    const verifiedUser = req.user;
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword)
       return res.status(400).json({
         success: false,
         message: Message.badRequest,
         data: null,
       });
     let user;
-    user = await Model.User.findOne({ _id:verifiedUser._id });
+    user = await Model.User.findOne({ _id: verifiedUser._id });
     //User not found
     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
     if (user) {
@@ -343,10 +346,7 @@ module.exports = {
       //   email,
       //   "User Account Email Verification | vagabond"
       // );
-      return res.ok(
-        "Admin Registred successfully.",
-        User
-      );
+      return res.ok("Admin Registred successfully.", User);
     } catch (err) {
       next(err);
     }
@@ -380,7 +380,7 @@ module.exports = {
   //           return res.badRequest("Invalid Credentials");
   //         }
   //       });
-  //     // } 
+  //     // }
   //     // else {
   //     //   return res.badRequest("User Not Verified");
   //     // }
@@ -392,29 +392,35 @@ module.exports = {
   loginAdmin: async (req, res, next) => {
     try {
       const { email, password } = req.body;
-  
+
       if (!email || !password) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
       }
-  
+
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
       }
-  
+
       let user = await Model.Admin.findOne({ email });
-  
+
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
-  
+      const newFieldValue = "new value";
       const match = await bcrypt.compare(password, user.password);
-  
+
       if (match) {
-        await Model.Admin.findOneAndUpdate({ _id: user._id });
-        const token = Services.JwtService.issue({
+        await Model.Admin.findOneAndUpdate(
+          { _id: user._id },
+          { $set: { fieldName: newFieldValue } }
+        );
+        // const token = Services.JwtService.issue({
+        //   id: Services.HashService.encrypt(user._id),
+        // });
+        const token = `GHA ${Services.JwtService.issue({
           id: Services.HashService.encrypt(user._id),
-        });
-  
+        })}`;
+
         return res.ok("Log in successfully", {
           token,
           user,

@@ -62,12 +62,20 @@ router.route("/deleteProduct/:id").delete(
 // get Product by id
 router.route("/findProductById/:id").get(
   // Authentication.UserAuth,
-  Controller.ProductController.getProductUser);
+  Controller.ProductController.getProductAdmin);
+
+  // get Product by id
+router.route("/findProductUserById/:id").get(
+  // Authentication.UserAuth,
+  Controller.ProductController.getAllProductUser);
 
   // get all  Products with details
 router.route("/getAllProducts").get(
   // Authentication.UserAuth,
-  Controller.ProductController.getAllProductUsers);
+  Controller.ProductController.getAllProductAdmin);
+  router.route("/getAllProductsUser").get(
+    // Authentication.UserAuth,
+    Controller.ProductController.getAllProductUser);
 
 
 
