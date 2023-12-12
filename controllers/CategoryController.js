@@ -121,30 +121,38 @@ module.exports = {
     }
   }),
 
-  // Update a Category user
   updateCategory: catchAsync(async (req, res, next) => {
-    // Get the Category user data from the request body
-    var CategoryUserData = req.body;
     try {
+      // // Validate the incoming data
+      // validateCategoryData(req.body);
+  
+      // Get the Category user data from the request body
+      const categoryUserData = req.body;
+  
+      // Find the category by ID
+      const existingCategory = await Model.Category.findById(categoryUserData.CategoryId);
+  
+      // Check if the category exists
+      if (!existingCategory) {
+        throw new HTTPError(Status.NOT_FOUND, "Category not found");
+      }
+  
       // Update the Category user with the updated data
-      var result = await Model.Category.findOneAndUpdate(
-        { _id: CategoryUserData.CategoryId },
-        CategoryUserData,
+      const result = await Model.Category.findByIdAndUpdate(
+        categoryUserData.CategoryId,
+        categoryUserData,
         {
           new: true,
         }
       );
-      // Check if the category exists
-      if (!result) {
-        throw new HTTPError(Status.NOT_FOUND, "Category not found");
-      }
-      var message = "Category  status updated successfully";
+  
+      const message = "Category status updated successfully";
       res.ok(message, result);
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      next(err); // Pass the error to the error-handling middleware
     }
   }),
-
+  
   // Delete a Category user
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
