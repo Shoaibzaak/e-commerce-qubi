@@ -49,14 +49,14 @@ module.exports = {
     console.log("createCategory is called");
     try {
       var CategoryData = req.body;
-    //   CategoryData.images = [];
-    //   if (Array.isArray(req.files.images)) {
-    //     for (let i = 0; i < req.files.images.length; i++) {
-    //       CategoryData.images.push(
-    //         `public/images/${req.files.images[i].originalname}`
-    //       );
-    //     }
-    //   }
+      //   CategoryData.images = [];
+      //   if (Array.isArray(req.files.images)) {
+      //     for (let i = 0; i < req.files.images.length; i++) {
+      //       CategoryData.images.push(
+      //         `public/images/${req.files.images[i].originalname}`
+      //       );
+      //     }
+      //   }
       var result = await CategoryHelper.createCategory(CategoryData);
 
       var message = "Category created successfully";
@@ -134,6 +134,10 @@ module.exports = {
           new: true,
         }
       );
+      // Check if the category exists
+      if (!result) {
+        throw new HTTPError(Status.NOT_FOUND, "Category not found");
+      }
       var message = "Category  status updated successfully";
       res.ok(message, result);
     } catch (err) {
@@ -145,7 +149,7 @@ module.exports = {
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
     try {
-      const CategoryUser = await Model.Category.findOneAndDelete(CategoryId);
+      const CategoryUser = await Model.Category.findByIdAndDelete(CategoryId);
       if (!CategoryUser)
         return res.badRequest("Category  Not Found in our records");
       var message = "Category user deleted successfully";

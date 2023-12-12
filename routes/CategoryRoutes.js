@@ -43,14 +43,14 @@ router.route("/createCategory").post(
   Controller.CategoryController.createCategory);
 
 //update Family
-router.route("/updateFamily").post(
-  Authentication.UserAuth,
-  Controller.FamilyController.updateFamily);
+router.route("/updateCategory").post(
+  // Authentication.AdminAuth
+  Controller.CategoryController.updateCategory);
 
 //delete Family
-router.route("/deleteFamily/:id").delete(
-  Authentication.UserAuth,
-  Controller.FamilyController.declineFamily);
+router.route("/deleteCategory/:id").delete(
+  // Authentication.AdminAuth
+  Controller.CategoryController.declineCategory);
 
 
 // get Family by id
