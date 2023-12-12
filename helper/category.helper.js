@@ -44,10 +44,10 @@ module.exports = {
     },
 
 
-    findCategoryById: async (query) => {
-        console.log("findCategoryById HelperFunction is called", query);
+    findCategoryById: async (id) => {
+        console.log("findCategoryById HelperFunction is called", id);
 
-        const Category= await Model.Category.findOne(query.critarion)
+        const Category= await Model.Category.findById(id)
         // .populate({
         //     path: 'CategorySubscription', populate: {
         //         path: "subscriptionId"

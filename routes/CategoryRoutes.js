@@ -54,9 +54,9 @@ router.route("/deleteCategory/:id").delete(
 
 
 // get Family by id
-router.route("/findFamilyById/:id").get(
-  Authentication.UserAuth,
-  Controller.FamilyController.getFamilyUser);
+router.route("/findCategoryById/:id").get(
+  // Authentication.UserAuth,
+  Controller.CategoryController.getCategoryUser);
 
   // get all  Familys with details
 router.route("/getAllCategories").get(
