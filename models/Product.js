@@ -12,9 +12,6 @@ const productModel = new Schema(
         type: String,
       },
     ],
-    model: {
-      type: String,
-    },
     description: {
       type: String,
       required: true,
@@ -35,13 +32,13 @@ const productModel = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
     },
-    // type: {
-    //   type: String,
-    // },
     color: {
       type: String,
     },
     store: {
+      type: String,
+    },
+    modal: {
       type: String,
     },
     availability: {
