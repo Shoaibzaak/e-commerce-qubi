@@ -132,8 +132,7 @@ module.exports = {
         .skip(pageNumber * limit - limit)
         .limit(limit)
         .sort("_id")
-        .populate('type')
-        ;
+        .populate("type");
       const ProductSize = products.length;
       const result = {
         Product: products,
@@ -148,63 +147,66 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
- // Get all Product users with full details
- getAllProductUser: catchAsync(async (req, res, next) => {
-  console.log("Productdetails is called");
-  try {
-    // var ProductData = req.body;
+  // Get all Product users with full details
+  getAllProductUser: catchAsync(async (req, res, next) => {
+    console.log("Productdetails is called");
+    try {
+      // var ProductData = req.body;
 
-    // var result = await ProductHelper.getProductWithFullDetails(ProductData.sortproperty, ProductData.sortorder, ProductData.offset, ProductData.limit, ProductData.query);
-    const pageNumber = parseInt(req.query.pageNumber) || 0;
-    const limit = parseInt(req.query.limit) || 10;
-    var message = "Productdetails found successfully";
-    var products = await Model.Product.find()
-      .skip(pageNumber * limit - limit)
-      .limit(limit)
-      .sort("_id")
-      .populate('type')
-      ;
-    const ProductSize = products.length;
-    const result = {
-      Product: products,
-      count: ProductSize,
-      limit: limit,
-    };
-    if (result == null) {
-      message = "Productdetails does not exist.";
+      // var result = await ProductHelper.getProductWithFullDetails(ProductData.sortproperty, ProductData.sortorder, ProductData.offset, ProductData.limit, ProductData.query);
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+      var message = "Productdetails found successfully";
+      var products = await Model.Product.find()
+        .skip(pageNumber * limit - limit)
+        .limit(limit)
+        .sort("_id")
+        .populate("type");
+      const ProductSize = products.length;
+      const result = {
+        Product: products,
+        count: ProductSize,
+        limit: limit,
+      };
+      if (result == null) {
+        message = "Productdetails does not exist.";
+      }
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      responseHelper.requestfailure(res, error);
     }
-    return responseHelper.success(res, result, message);
-  } catch (error) {
-    responseHelper.requestfailure(res, error);
-  }
-}),
+  }),
   // Update a Product user
   updateProduct: catchAsync(async (req, res, next) => {
-    // Get the Product user data from the request body
-    var ProductUserData = req.body;
-    const files = req.files.images;
-    ProductUserData.images = [];
-    if (req.files.images) {
-      for (const file of files) {
-        const { path } = file;
-        const newPath = await cloudUpload.cloudinaryUpload(path);
-        ProductUserData.images.push(newPath);
-      }
-    }
     try {
-      // Update the Product user with the updated data
-      var result = await Model.Product.findOneAndUpdate(
+      console.log("updateProduct has been called");
+      const ProductUserData = req.body;
+      const files = req.files.images;
+
+      // Check if files (images) exist
+      if (files && files.length > 0) {
+        ProductUserData.images = [];
+
+        for (const file of files) {
+          const { path } = file;
+          const newPath = await cloudUpload.cloudinaryUpload(path);
+          ProductUserData.images.push(newPath);
+        }
+      }
+      const updatedProduct = await Model.Product.findOneAndUpdate(
         { _id: ProductUserData.ProductId },
         ProductUserData,
-        {
-          new: true,
-        }
+        { new: true }
       );
-      // console.log(result,'result====>')
-      var message = "Product  status updated successfully";
-      res.ok(message, result);
+
+      if (!updatedProduct) {
+        throw new HTTPError(Status.NOT_FOUND, "Product not found");
+      }
+
+      const message = "Product status updated successfully";
+      res.ok(message, updatedProduct);
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      next(err); // Pass the error to the next middleware for centralized error handling
     }
   }),
 
