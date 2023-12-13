@@ -321,7 +321,7 @@ module.exports = {
 
       const isValidate = await validatePassword({ password });
       if (!isValidate) return res.badRequest(Message.passwordTooWeak);
-      const hash = encrypt.hashSync(password, 10);
+      const hash = bcrypt.hashSync(password, 10);
       // const otp = otpService.issue();
       // const otpExpiry = moment().add(10, "minutes").valueOf();
       const verifyEmail = await Model.Admin.findOne({ email });
