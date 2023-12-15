@@ -66,10 +66,10 @@ const productModel = new Schema(
       enum: ["Cancelled", "Shipped", "Processing"],
       default: "Processing",
     },
-    // reviews: [{
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Review",
-    // }],
+    reviews: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
+    }],
     isDeleted: {
       type: Boolean,
       default: false,

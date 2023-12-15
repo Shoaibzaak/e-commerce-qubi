@@ -188,14 +188,14 @@ module.exports = {
         // If the calculated skip value is less than 0, return a bad request response
         return res.badRequest("Invalid combination of pageNumber and limit.");
       }
-  
+      const productsTotal=await Model.Product.find()
       const products = await Model.Product.find()
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
         .populate("type");
   
-      const ProductSize = products.length;
+      const ProductSize = productsTotal.length;
   
       const result = {
         Product: products,
