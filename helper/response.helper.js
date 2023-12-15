@@ -44,7 +44,7 @@ let systemfailure = (response, err) => {
 
 let requestfailure = (response, err, jsonerr = null) => {
     // let status = 404;
-    let status = 200; // android developers needs 200 status everywhere -_-
+    let status = 404; // android developers needs 200 status everywhere -_-
 
 
     if (typeof err === 'object' && err.message) {
@@ -64,7 +64,7 @@ let requestfailure = (response, err, jsonerr = null) => {
 
 let badRequest = (response, message) => {
     // let status = 400;
-    let status = 200; // android developers needs 200 status everywhere -_-
+    let status = 400; // android developers needs 200 status everywhere -_-
 
     response.status(status).json({
         status: 'Fail',
