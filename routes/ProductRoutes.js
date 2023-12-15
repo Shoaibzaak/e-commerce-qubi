@@ -64,18 +64,19 @@ router.route("/findProductById/:id").get(
   // Authentication.UserAuth,
   Controller.ProductController.getProductAdmin);
 
-  // get Product by id
-router.route("/findProductUserById/:id").get(
-  // Authentication.UserAuth,
-  Controller.ProductController.getProductUser);
-
   // get all  Products with details
 router.route("/getAllProducts").get(
   // Authentication.UserAuth,
   Controller.ProductController.getAllProductAdmin);
+
+//=======================  cutomer app side product api's will be start from this ===================    //
   router.route("/getAllProductsUser").get(
     // Authentication.UserAuth,
     Controller.ProductController.getAllProductUser);
+      // get Product by id
+router.route("/findProductUserById/:id").get(
+  // Authentication.UserAuth,
+  Controller.ProductController.getProductUser);
 
 
 

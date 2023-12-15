@@ -165,7 +165,7 @@ module.exports = {
       const ProductSize = products.length;
       const result = {
         Product: products,
-        count: ProductSize,
+        totalProducts: ProductSize,
         limit: limit,
       };
       if (result == null) {
