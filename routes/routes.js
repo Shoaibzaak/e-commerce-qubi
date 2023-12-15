@@ -5,4 +5,5 @@ router.use("/auth/user", Routes.UserAuthRoutes);
 router.use("/familyMember", Routes.FamilyRoutes);
 router.use("/product", Routes.ProductRoutes);
 router.use("/category", Routes.CategoryRoutes);
+router.use("/brand", Routes.BrandRoutes);
 module.exports = router;

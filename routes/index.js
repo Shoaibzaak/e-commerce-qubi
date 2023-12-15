@@ -3,6 +3,7 @@ module.exports = {
   UserAuthRoutes: require("./Auth/UserAuthRoutes"),
   CategoryRoutes: require("./CategoryRoutes"),
   ProductRoutes: require("./ProductRoutes"),
+  BrandRoutes: require("./BrandRoutes"),
 
 
 };

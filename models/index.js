@@ -4,5 +4,6 @@ module.exports = {
   Admin: require("./Admin"),
   Category: require("./Category"),
   Order: require("./Order"),
+  Brand: require("./Brand")
  
 };

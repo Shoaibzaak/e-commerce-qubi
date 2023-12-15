@@ -17,7 +17,8 @@ const productModel = new Schema(
       required: true,
     },
     brand: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
     },
     price: {
       type: Number,

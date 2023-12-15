@@ -32,7 +32,7 @@ var upload = multer({ //multer settings
 })
 
 //post custom Family 
-router.route("/createCategory").post(
+router.route("/createBrand").post(
 //   upload.fields([
 //     {
 //       name: "images",
@@ -40,37 +40,28 @@ router.route("/createCategory").post(
 //     },
 //   ]),
   // Authentication.AdminAuth,
-  Controller.CategoryController.createCategory);
+  Controller.BrandController.createBrand);
 
 //update Family
-router.route("/updateCategory").post(
+router.route("/updateBrand").post(
   // Authentication.AdminAuth
-  Controller.CategoryController.updateCategory);
+  Controller.BrandController.updateBrand);
 
 //delete Family
-router.route("/deleteCategory/:id").delete(
+router.route("/deleteBrand/:id").delete(
   // Authentication.AdminAuth
-  Controller.CategoryController.declineCategory);
+  Controller.BrandController.declineBrand);
 
 
 // get Family by id
-router.route("/findCategoryById/:id").get(
+router.route("/findBrandById/:id").get(
   // Authentication.UserAuth,
-  Controller.CategoryController.getCategoryUser);
+  Controller.BrandController.getBrandUser);
 
   // get all  Familys with details
-router.route("/getAllCategories").get(
+router.route("/getAllBrands").get(
   // Authentication.AdminAuth,
-  Controller.CategoryController.getAllCategoryUsers);
-
-
-
-
-//====================mat website api's====================>
-
-router.route("/getAllCategoriesAndBrand").get(
-  // Authentication.AdminAuth,
-  Controller.CategoryController.getAllCategoryBrand);
+  Controller.BrandController.getAllBrandUsers);
 
 
 

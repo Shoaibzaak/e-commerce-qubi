@@ -102,13 +102,13 @@ module.exports = {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
       var message = "Categorydetails found successfully";
-      var Families = await Model.Category.find()
+      var categorys = await Model.Category.find()
         .skip(pageNumber * limit - limit)
         .limit(limit)
         .sort("-_id");
-      const CategorySize = Families.length;
+      const CategorySize = categorys.length;
       const result = {
-        Category: Families,
+        Category: categorys,
         count: CategorySize,
         limit: limit,
       };
@@ -125,18 +125,20 @@ module.exports = {
     try {
       // // Validate the incoming data
       // validateCategoryData(req.body);
-  
+
       // Get the Category user data from the request body
       const categoryUserData = req.body;
-  
+
       // Find the category by ID
-      const existingCategory = await Model.Category.findById(categoryUserData.CategoryId);
-  
+      const existingCategory = await Model.Category.findById(
+        categoryUserData.CategoryId
+      );
+
       // Check if the category exists
       if (!existingCategory) {
         throw new HTTPError(Status.NOT_FOUND, "Category not found");
       }
-  
+
       // Update the Category user with the updated data
       const result = await Model.Category.findByIdAndUpdate(
         categoryUserData.CategoryId,
@@ -145,14 +147,14 @@ module.exports = {
           new: true,
         }
       );
-  
+
       const message = "Category status updated successfully";
       res.ok(message, result);
     } catch (err) {
       next(err); // Pass the error to the error-handling middleware
     }
   }),
-  
+
   // Delete a Category user
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
@@ -164,6 +166,60 @@ module.exports = {
       res.ok(message, CategoryUser);
     } catch (err) {
       throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+    }
+  }),
+
+  //======================Mat webiste api's
+  // Get all Category users with full details
+  getAllCategoryBrand: catchAsync(async (req, res, next) => {
+    console.log("CategoryBranddetails is called");
+    try {
+      // var CategoryData = req.body;
+
+      // var result = await CategoryHelper.getCategoryWithFullDetails(CategoryData.sortproperty, CategoryData.sortorder, CategoryData.offset, CategoryData.limit, CategoryData.query);
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+  
+      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
+        // If pageNumber or limit is not a valid non-negative number, return a bad request response
+        return res.badRequest("Invalid query parameters");
+        // return responseHelper.badRequest(res, "Invalid query parameters.");
+      }
+  
+      const message = "CategoryBranddetails found successfully";
+  
+      const skipValue = pageNumber * limit - limit;
+      
+      if (skipValue < 0) {
+        // If the calculated skip value is less than 0, return a bad request response
+        return res.badRequest("Invalid combination of pageNumber and limit.");
+      }
+      var categoriesTotal = await Model.Category.find();
+      var brandsTotal = await Model.Brand.find();
+      var categorys = await Model.Category.find()
+        .skip(pageNumber * limit - limit)
+        .limit(limit)
+        .sort("-_id");
+      var brands = await Model.Brand.find()
+        .skip(pageNumber * limit - limit)
+        .limit(limit)
+        .sort("-_id");
+      const CategorySize = categoriesTotal.length;
+      const BrandSize = brandsTotal.length;
+      const result = {
+        Category: categorys,
+        Brand: brands,
+        totalCategory: CategorySize,
+        totalBrand: BrandSize,
+        limit: limit,
+      };
+      if (CategorySize === 0 ||BrandSize===0) {
+        // If no products are found, return a not found response
+        return responseHelper.notFound(res, "Category and Brand details do not exist.");
+      }
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      responseHelper.requestfailure(res, error);
     }
   }),
 };

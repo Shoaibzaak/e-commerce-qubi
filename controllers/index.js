@@ -3,4 +3,5 @@ module.exports = {
   FamilyController: require("./FamilyController"),
   ProductController: require("./ProductController"),
   CategoryController: require("./CategoryController"),
+  BrandController: require("./BrandController"),
 };
