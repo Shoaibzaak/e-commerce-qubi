@@ -3,5 +3,6 @@ module.exports = {
   Product:require('./Product'),
   Admin: require("./Admin"),
   Category: require("./Category"),
+  Order: require("./Order"),
  
 };

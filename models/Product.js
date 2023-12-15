@@ -21,12 +21,21 @@ const productModel = new Schema(
     },
     price: {
       type: Number,
+      min: 0,
     },
     productRate: {
       type: Number,
+      default: 0,
     },
+    // use for invidual ratings given by user
+    ratings: [
+      {
+        type: Number,
+      },
+    ],
     quantity: {
       type: Number,
+      min: 0,
     },
     type: {
       type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +43,7 @@ const productModel = new Schema(
     },
     color: {
       type: String,
+      // enum: ["Red", "Blue", "Green", "Other"],
     },
     store: {
       type: String,
@@ -56,6 +66,10 @@ const productModel = new Schema(
       enum: ["Cancelled", "Shipped", "Processing"],
       default: "Processing",
     },
+    // reviews: [{
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Review",
+    // }],
     isDeleted: {
       type: Boolean,
       default: false,
