@@ -121,29 +121,49 @@ module.exports = {
   // Get all Product users with full details
   getAllProductAdmin: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
+  
     try {
-      // var ProductData = req.body;
-
-      // var result = await ProductHelper.getProductWithFullDetails(ProductData.sortproperty, ProductData.sortorder, ProductData.offset, ProductData.limit, ProductData.query);
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
-      var message = "Productdetails found successfully";
-      var products = await Model.Product.find()
-        .skip(pageNumber * limit - limit)
+  
+      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
+        // If pageNumber or limit is not a valid non-negative number, return a bad request response
+        return res.badRequest("Invalid query parameters");
+        // return responseHelper.badRequest(res, "Invalid query parameters.");
+      }
+  
+      const message = "Productdetails found successfully";
+  
+      const skipValue = pageNumber * limit - limit;
+      
+      if (skipValue < 0) {
+        // If the calculated skip value is less than 0, return a bad request response
+        return res.badRequest("Invalid combination of pageNumber and limit.");
+      }
+  
+      const products = await Model.Product.find()
+        .skip(skipValue)
         .limit(limit)
         .sort("_id")
         .populate("type");
+  
       const ProductSize = products.length;
+  
       const result = {
         Product: products,
-        count: ProductSize,
+        totalProducts: ProductSize,
         limit: limit,
       };
-      if (result == null) {
-        message = "Productdetails does not exist.";
+  
+      if (ProductSize === 0) {
+        // If no products are found, return a not found response
+        return responseHelper.notFound(res, "Productdetails do not exist.");
       }
+  
+      // Return a success response with status code 200
       return responseHelper.success(res, result, message);
     } catch (error) {
+      // Return a failure response with status code 500
       responseHelper.requestfailure(res, error);
     }
   }),
