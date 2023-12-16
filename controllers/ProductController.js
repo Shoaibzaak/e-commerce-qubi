@@ -145,7 +145,8 @@ module.exports = {
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
-        .populate("type");
+        .populate("type")
+        .populate("brand");
   
       const ProductSize = products.length;
   
@@ -193,7 +194,8 @@ module.exports = {
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
-        .populate("type");
+        .populate("type")
+        .populate("brand");
   
       const ProductSize = productsTotal.length;
   
