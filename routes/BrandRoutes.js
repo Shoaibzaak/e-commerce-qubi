@@ -39,28 +39,28 @@ router.route("/createBrand").post(
 //       maxCount: 10,
 //     },
 //   ]),
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.BrandController.createBrand);
 
 //update Family
 router.route("/updateBrand").post(
-  // Authentication.AdminAuth
+  Authentication.AdminAuth,
   Controller.BrandController.updateBrand);
 
 //delete Family
 router.route("/deleteBrand/:id").delete(
-  // Authentication.AdminAuth
+  Authentication.AdminAuth,
   Controller.BrandController.declineBrand);
 
 
 // get Family by id
 router.route("/findBrandById/:id").get(
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.BrandController.getBrandUser);
 
   // get all  Familys with details
 router.route("/getAllBrands").get(
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.BrandController.getAllBrandUsers);
 
 

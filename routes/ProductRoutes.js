@@ -39,7 +39,7 @@ router.route("/createProduct").post(
       maxCount: 10,
     },
   ]),
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.createProduct);
 
 //update Product
@@ -50,23 +50,23 @@ router.route("/updateProduct").post(
       maxCount: 10,
     },
   ]),
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.updateProduct);
 
 //delete Product
 router.route("/deleteProduct/:id").delete(
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.declineProduct);
 
 
 // get Product by id
 router.route("/findProductById/:id").get(
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.getProductAdmin);
 
   // get all  Products with details
 router.route("/getAllProducts").get(
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.getAllProductAdmin);
 
 //=======================  cutomer app side product api's will be start from this ===================    //

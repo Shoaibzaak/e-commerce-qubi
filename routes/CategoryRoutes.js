@@ -39,28 +39,28 @@ router.route("/createCategory").post(
 //       maxCount: 10,
 //     },
 //   ]),
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.CategoryController.createCategory);
 
 //update Family
 router.route("/updateCategory").post(
-  // Authentication.AdminAuth
+  Authentication.AdminAuth,
   Controller.CategoryController.updateCategory);
 
 //delete Family
 router.route("/deleteCategory/:id").delete(
-  // Authentication.AdminAuth
+  Authentication.AdminAuth,
   Controller.CategoryController.declineCategory);
 
 
 // get Family by id
 router.route("/findCategoryById/:id").get(
-  // Authentication.UserAuth,
+  Authentication.AdminAuth,
   Controller.CategoryController.getCategoryUser);
 
   // get all  Familys with details
 router.route("/getAllCategories").get(
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.CategoryController.getAllCategoryUsers);
 
 

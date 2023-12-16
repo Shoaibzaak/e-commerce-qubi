@@ -95,13 +95,13 @@ module.exports = {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
       var message = "Branddetails found successfully";
-      var Families = await Model.Brand.find()
+      var brands = await Model.Brand.find()
         .skip(pageNumber * limit - limit)
         .limit(limit)
         .sort("-_id");
-      const BrandSize = Families.length;
+      const BrandSize = brands.length;
       const result = {
-        Brand: Families,
+        Brand: brands,
         count: BrandSize,
         limit: limit,
       };
