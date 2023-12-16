@@ -63,56 +63,33 @@ module.exports = {
     }
   }),
 
-  // Get a list of Brands
-  getBrandList: async (req, res) => {
-    console.log("getBrandList called");
-    var BrandData = req.body;
+ // Get all Brand users with full details
+getAllBrandUsers: catchAsync(async (req, res, next) => {
+  console.log("Branddetails is called");
+  try {
+    // Fetch all brands without pagination
+    const brands = await Model.Brand.find().sort("-_id");
 
-    try {
-      var result = await BrandHelper.getBrandList(
-        BrandData.sortproperty,
-        BrandData.sortorder,
-        BrandData.offset,
-        BrandData.limit,
-        BrandData.query
-      );
+    const BrandSize = brands.length;
 
-      var message = "Successfully loaded";
+    const result = {
+      Brand: brands,
+      count: BrandSize,
+    };
 
-      responseHelper.success(res, result, message);
-    } catch (err) {
-      responseHelper.requestfailure(res, err);
+    // Check if no brands are found
+    if (BrandSize === 0) {
+      return responseHelper.notFound(res, "Branddetails do not exist.");
     }
-  },
 
-  // Get all Brand users with full details
-  getAllBrandUsers: catchAsync(async (req, res, next) => {
-    console.log("Branddetails is called");
-    try {
-      // var BrandData = req.body;
+    // Return a success response with the result
+    return responseHelper.success(res, result, "Branddetails found successfully");
+  } catch (error) {
+    // Handle errors and return a failure response
+    responseHelper.requestfailure(res, error);
+  }
+}),
 
-      // var result = await BrandHelper.getBrandWithFullDetails(BrandData.sortproperty, BrandData.sortorder, BrandData.offset, BrandData.limit, BrandData.query);
-      const pageNumber = parseInt(req.query.pageNumber) || 0;
-      const limit = parseInt(req.query.limit) || 10;
-      var message = "Branddetails found successfully";
-      var brands = await Model.Brand.find()
-        .skip(pageNumber * limit - limit)
-        .limit(limit)
-        .sort("-_id");
-      const BrandSize = brands.length;
-      const result = {
-        Brand: brands,
-        count: BrandSize,
-        limit: limit,
-      };
-      if (result == null) {
-        message = "Branddetails does not exist.";
-      }
-      return responseHelper.success(res, result, message);
-    } catch (error) {
-      responseHelper.requestfailure(res, error);
-    }
-  }),
 
   updateBrand: catchAsync(async (req, res, next) => {
     try {

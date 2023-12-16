@@ -96,27 +96,29 @@ module.exports = {
   getAllCategoryUsers: catchAsync(async (req, res, next) => {
     console.log("Categorydetails is called");
     try {
-      // var CategoryData = req.body;
+      // Fetch all categories without pagination
+      const categorys = await Model.Category.find().sort("-_id");
 
-      // var result = await CategoryHelper.getCategoryWithFullDetails(CategoryData.sortproperty, CategoryData.sortorder, CategoryData.offset, CategoryData.limit, CategoryData.query);
-      const pageNumber = parseInt(req.query.pageNumber) || 0;
-      const limit = parseInt(req.query.limit) || 10;
-      var message = "Categorydetails found successfully";
-      var categorys = await Model.Category.find()
-        .skip(pageNumber * limit - limit)
-        .limit(limit)
-        .sort("-_id");
       const CategorySize = categorys.length;
+
       const result = {
         Category: categorys,
         count: CategorySize,
-        limit: limit,
       };
-      if (result == null) {
-        message = "Categorydetails does not exist.";
+
+      // Check if no categories are found
+      if (CategorySize === 0) {
+        return responseHelper.notFound(res, "Categorydetails do not exist.");
       }
-      return responseHelper.success(res, result, message);
+
+      // Return a success response with the result
+      return responseHelper.success(
+        res,
+        result,
+        "Categorydetails found successfully"
+      );
     } catch (error) {
+      // Handle errors and return a failure response
       responseHelper.requestfailure(res, error);
     }
   }),
@@ -170,53 +172,31 @@ module.exports = {
   }),
 
   //======================Mat webiste api's
-  // Get all Category users with full details
   getAllCategoryBrand: catchAsync(async (req, res, next) => {
     console.log("CategoryBranddetails is called");
     try {
-      // var CategoryData = req.body;
+      const categories = await Model.Category.find().sort("-_id");
+      const brands = await Model.Brand.find().sort("-_id");
 
-      // var result = await CategoryHelper.getCategoryWithFullDetails(CategoryData.sortproperty, CategoryData.sortorder, CategoryData.offset, CategoryData.limit, CategoryData.query);
-      const pageNumber = parseInt(req.query.pageNumber) || 0;
-      const limit = parseInt(req.query.limit) || 10;
-  
-      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-        // If pageNumber or limit is not a valid non-negative number, return a bad request response
-        return res.badRequest("Invalid query parameters");
-        // return responseHelper.badRequest(res, "Invalid query parameters.");
-      }
-  
-      const message = "CategoryBranddetails found successfully";
-  
-      const skipValue = pageNumber * limit - limit;
-      
-      if (skipValue < 0) {
-        // If the calculated skip value is less than 0, return a bad request response
-        return res.badRequest("Invalid combination of pageNumber and limit.");
-      }
-      var categoriesTotal = await Model.Category.find();
-      var brandsTotal = await Model.Brand.find();
-      var categorys = await Model.Category.find()
-        .skip(pageNumber * limit - limit)
-        .limit(limit)
-        .sort("-_id");
-      var brands = await Model.Brand.find()
-        .skip(pageNumber * limit - limit)
-        .limit(limit)
-        .sort("-_id");
-      const CategorySize = categoriesTotal.length;
-      const BrandSize = brandsTotal.length;
+      const CategorySize = categories.length;
+      const BrandSize = brands.length;
+
       const result = {
-        Category: categorys,
+        Category: categories,
         Brand: brands,
         totalCategory: CategorySize,
         totalBrand: BrandSize,
-        limit: limit,
       };
-      if (CategorySize === 0 ||BrandSize===0) {
+
+      if (CategorySize === 0 || BrandSize === 0) {
         // If no products are found, return a not found response
-        return responseHelper.notFound(res, "Category and Brand details do not exist.");
+        return responseHelper.notFound(
+          res,
+          "Category and Brand details do not exist."
+        );
       }
+
+      const message = "CategoryBranddetails found successfully";
       return responseHelper.success(res, result, message);
     } catch (error) {
       responseHelper.requestfailure(res, error);
