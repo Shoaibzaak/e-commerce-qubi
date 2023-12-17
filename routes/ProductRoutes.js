@@ -39,7 +39,7 @@ router.route("/createProduct").post(
       maxCount: 10,
     },
   ]),
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   Controller.ProductController.createProduct);
 
 //update Product

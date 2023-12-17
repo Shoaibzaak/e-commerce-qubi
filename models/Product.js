@@ -1,6 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const variationSchema = new Schema({
+  color: {
+    type: String,
+    // enum: ["Red", "Blue", "Green", "Other"],
+  },
+  quantity: {
+    type: Number,
+    min: 0,
+  },
+  size: {
+    type: String,
+    enum: ["Small", "Medium", "Large"],
+  },
+});
+
+
 const productModel = new Schema(
   {
     name: {
@@ -34,18 +50,18 @@ const productModel = new Schema(
         type: Number,
       },
     ],
-    quantity: {
-      type: Number,
-      min: 0,
-    },
+    // quantity: {
+    //   type: Number,
+    //   min: 0,
+    // },
     type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
     },
-    color: {
-      type: String,
-      // enum: ["Red", "Blue", "Green", "Other"],
-    },
+    // color: {
+    //   type: String,
+    //   // enum: ["Red", "Blue", "Green", "Other"],
+    // },
     store: {
       type: String,
     },
@@ -57,20 +73,21 @@ const productModel = new Schema(
       enum: ["In Stock", "Out Stock", "Low Stock"],
       default: "In Stock",
     },
-    size: {
-      type: String,
-      enum: ["Small", "Medium", "Large"],
-      default: "Medium",
-    },
+    // size: {
+    //   type: String,
+    //   enum: ["Small", "Medium", "Large"],
+    //   default: "Medium",
+    // },
     status: {
       type: String,
       enum: ["Cancelled", "Shipped", "Processing"],
       default: "Processing",
     },
-    reviews: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Review",
-    }],
+    variations: [variationSchema],
+    // reviews: [{
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Review",
+    // }],
     isDeleted: {
       type: Boolean,
       default: false,
