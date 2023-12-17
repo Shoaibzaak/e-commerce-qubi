@@ -65,11 +65,17 @@ const productModel = new Schema(
       enum: ["In Stock", "Out Stock", "Low Stock"],
       default: "In Stock",
     },
-    status: {
-      type: String,
-      enum: ["Cancelled", "Shipped", "Processing"],
-      default: "Processing",
+    discount: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
     },
+    // status: {
+    //   type: String,
+    //   enum: ["Cancelled", "Shipped", "Processing"],
+    //   default: "Processing",
+    // },
     variations: [variationSchema],
     // reviews: [{
     //   type: mongoose.Schema.Types.ObjectId,
