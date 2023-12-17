@@ -13,6 +13,7 @@ module.exports = {
     createProduct: async (data) => {
         console.log("createProductHelperFunction is called");
         const Product= new Model.Product(data)
+        console.log(Product,'Product===>')
         await Product.save()
         return Product
 

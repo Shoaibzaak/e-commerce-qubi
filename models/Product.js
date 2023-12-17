@@ -50,18 +50,10 @@ const productModel = new Schema(
         type: Number,
       },
     ],
-    // quantity: {
-    //   type: Number,
-    //   min: 0,
-    // },
     type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
     },
-    // color: {
-    //   type: String,
-    //   // enum: ["Red", "Blue", "Green", "Other"],
-    // },
     store: {
       type: String,
     },
@@ -73,11 +65,6 @@ const productModel = new Schema(
       enum: ["In Stock", "Out Stock", "Low Stock"],
       default: "In Stock",
     },
-    // size: {
-    //   type: String,
-    //   enum: ["Small", "Medium", "Large"],
-    //   default: "Medium",
-    // },
     status: {
       type: String,
       enum: ["Cancelled", "Shipped", "Processing"],
