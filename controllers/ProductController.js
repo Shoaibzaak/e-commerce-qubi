@@ -8,8 +8,7 @@ const Status = require("../status");
 const catchAsync = require("../utils/catchAsync");
 const getDistance = require("../utils/getDistance");
 const cloudUpload = require("../cloudinary");
-const Sku=require('../helper/sku.helper')
-
+const Sku = require("../helper/sku.helper");
 
 module.exports = {
   // Retrieve Product user by ProductId
@@ -55,7 +54,23 @@ module.exports = {
     console.log("createProduct is called");
     try {
       var ProductData = req.body;
+      console.log(ProductData, "ProductData");
       const files = req.files.images;
+      // Validate and set unique SKUs
+      if (ProductData.productType === "simple") {
+        if (!ProductData.sku) {
+          ProductData.sku = await Sku.generateUniqueSKU();
+        }
+      } else if (ProductData.productType === "variations") {
+        for (let variation of ProductData.variations) {
+          if (!variation.sku) {
+            variation.sku = await Sku.generateUniqueSKU();
+          }
+        }
+      } else {
+        return res.status(400).json({ error: "Invalid productType" });
+      }
+
       ProductData.images = [];
       // if (Array.isArray(req.files.images)) {
       //   for (let i = 0; i < req.files.images.length; i++) {
@@ -71,15 +86,6 @@ module.exports = {
           ProductData.images.push(newPath);
         }
       }
-       // If it's a simple product, generate a SKU
-    if (ProductData.productType === 'simple') {
-      ProductData.sku = Sku.generateSKU()
-    } else if (ProductData.productType === 'variations') {
-      // If it's a product with variations, generate SKUs for each variation
-      ProductData.variations.forEach(variation => {
-        variation.sku = Sku.generateSKU()
-      });
-    }
 
       var result = await ProductHelper.createProduct(ProductData);
 
@@ -167,8 +173,6 @@ module.exports = {
       // Return a failure response with status code 500
       responseHelper.requestfailure(res, error);
     }
-
-    
   }),
   getAllProductUser: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
