@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const variationSchema = new Schema({
   color: {
     type: String,
-    // enum: ["Red", "Blue", "Green", "Other"],
   },
   quantity: {
     type: Number,
@@ -14,6 +13,12 @@ const variationSchema = new Schema({
     type: String,
     enum: ["Small", "Medium", "Large"],
   },
+  sku: {
+    type: String,
+    unique: true,
+    // required: true,
+  },
+  
 });
 
 
@@ -71,11 +76,16 @@ const productModel = new Schema(
       max: 100,
       default: 0,
     },
-    // status: {
-    //   type: String,
-    //   enum: ["Cancelled", "Shipped", "Processing"],
-    //   default: "Processing",
-    // },
+    productType: {
+      type: String,
+      enum: ["simple", "variations"],
+      required: true,
+      default: "simple", // Default to simple product type
+    },
+    sku: {  // SKU field directly under product for simple products
+      type: String,
+      unique: true,
+    },
     variations: [variationSchema],
     // reviews: [{
     //   type: mongoose.Schema.Types.ObjectId,
@@ -96,6 +106,7 @@ const productModel = new Schema(
     strict: true,
   }
 );
+
 
 productModel.set("toJSON", {
   virtuals: false,

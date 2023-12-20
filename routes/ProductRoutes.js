@@ -71,7 +71,7 @@ router.route("/getAllProducts").get(
 
 //=======================  cutomer app side product api's will be start from this ===================    //
   router.route("/getAllProductsUser").get(
-    // Authentication.UserAuth,
+    Authentication.UserAuth,
     Controller.ProductController.getAllProductUser);
       // get Product by id
 router.route("/findProductUserById/:id").get(
