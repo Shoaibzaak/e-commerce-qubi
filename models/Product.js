@@ -15,7 +15,7 @@ const variationSchema = new Schema({
   },
   sku: {
     type: String,
-    unique: true,
+    // unique: true,
     // required: true,
   },
   
@@ -84,7 +84,7 @@ const productModel = new Schema(
     },
     sku: {  // SKU field directly under product for simple products
       type: String,
-      unique: true,
+      // unique: true,
     },
     variations: [variationSchema],
     // reviews: [{

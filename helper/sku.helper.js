@@ -8,7 +8,6 @@ let generateUniqueSKU = async () => {
             
             // Check if the potential SKU already exists in the database
             const existingProduct = await Modle.Product.findOne({ $or: [{ sku: potentialSKU }, { 'variations.sku': potentialSKU }] });
-
             if (!existingProduct) {
                 return potentialSKU;  // This SKU is unique, so we can return it
             }
