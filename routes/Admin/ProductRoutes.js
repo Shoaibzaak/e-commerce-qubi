@@ -1,9 +1,9 @@
 const express = require("express");
-const Controller = require("../controllers/index");
+const Controller = require("../../controllers/index");
 const router = express.Router();
 const path = require("path");
 const multer = require("multer");
-const Authentication = require("../policy/index");
+const Authentication = require("../../policy/index");
 
 const userStorage = multer.diskStorage({
   // destination: (req, file, cb) => {

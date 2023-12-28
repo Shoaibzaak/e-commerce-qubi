@@ -1,7 +1,7 @@
 module.exports = {
-  UserAuthController: require("./Auth/UserAuthController"),
+  UserAuthController: require("./Admin/UserAuthController"),
   FamilyController: require("./FamilyController"),
-  ProductController: require("./ProductController"),
-  CategoryController: require("./CategoryController"),
-  BrandController: require("./BrandController"),
+  ProductController: require("./Admin/ProductController"),
+  CategoryController: require("./Admin/CategoryController"),
+  BrandController: require("./Admin/BrandController"),
 };

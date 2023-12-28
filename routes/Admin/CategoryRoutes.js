@@ -1,9 +1,9 @@
 const express = require("express");
-const Controller = require("../controllers/index");
+const Controller = require("../../controllers/index");
 const router = express.Router();
 const path = require("path");
 const multer = require("multer");
-const Authentication = require("../policy/index");
+const Authentication = require("../../policy/index");
 
 const userStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -32,7 +32,7 @@ var upload = multer({ //multer settings
 })
 
 //post custom Family 
-router.route("/createBrand").post(
+router.route("/createCategory").post(
 //   upload.fields([
 //     {
 //       name: "images",
@@ -40,28 +40,37 @@ router.route("/createBrand").post(
 //     },
 //   ]),
   Authentication.AdminAuth,
-  Controller.BrandController.createBrand);
+  Controller.CategoryController.createCategory);
 
 //update Family
-router.route("/updateBrand").post(
+router.route("/updateCategory").post(
   Authentication.AdminAuth,
-  Controller.BrandController.updateBrand);
+  Controller.CategoryController.updateCategory);
 
 //delete Family
-router.route("/deleteBrand/:id").delete(
+router.route("/deleteCategory/:id").delete(
   Authentication.AdminAuth,
-  Controller.BrandController.declineBrand);
+  Controller.CategoryController.declineCategory);
 
 
 // get Family by id
-router.route("/findBrandById/:id").get(
+router.route("/findCategoryById/:id").get(
   Authentication.AdminAuth,
-  Controller.BrandController.getBrandUser);
+  Controller.CategoryController.getCategoryUser);
 
   // get all  Familys with details
-router.route("/getAllBrands").get(
+router.route("/getAllCategories").get(
   Authentication.AdminAuth,
-  Controller.BrandController.getAllBrandUsers);
+  Controller.CategoryController.getAllCategoryUsers);
+
+
+
+
+//====================mat website api's====================>
+
+router.route("/getAllCategoriesAndBrand").get(
+  // Authentication.AdminAuth,
+  Controller.CategoryController.getAllCategoryBrand);
 
 
 

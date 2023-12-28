@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const stripe = require("stripe")("sk_test_N8bwtya9NU0jFB5ieNazsfbJ");
-const Model = require("../models/index");
-const HTTPError = require("../utils/CustomError");
-const responseHelper = require("../helper/response.helper");
-const ProductHelper = require("../helper/product.helper");
-const Status = require("../status");
-const catchAsync = require("../utils/catchAsync");
-const getDistance = require("../utils/getDistance");
-const cloudUpload = require("../cloudinary");
-const Sku = require("../helper/sku.helper");
+const Model = require("../../models/index");
+const HTTPError = require("../../utils/CustomError");
+const responseHelper = require("../../helper/response.helper");
+const ProductHelper = require("../../helper/product.helper");
+const Status = require("../../status");
+const catchAsync = require("../../utils/catchAsync");
+// const getDistance = require("../utils/getDistance");
+const cloudUpload = require("../../cloudinary");
+const Sku = require("../../helper/sku.helper");
 
 module.exports = {
   // Retrieve Product user by ProductId
