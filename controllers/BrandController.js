@@ -68,7 +68,7 @@ getAllBrandUsers: catchAsync(async (req, res, next) => {
   console.log("Branddetails is called");
   try {
     // Fetch all brands without pagination
-    const brands = await Model.Brand.find().sort("-_id");
+    const brands = await Model.Brand.find({isDeleted:false}).sort("-_id");
 
     const BrandSize = brands.length;
 

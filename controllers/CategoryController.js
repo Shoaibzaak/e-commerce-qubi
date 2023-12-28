@@ -97,7 +97,7 @@ module.exports = {
     console.log("Categorydetails is called");
     try {
       // Fetch all categories without pagination
-      const categorys = await Model.Category.find().sort("-_id");
+      const categorys = await Model.Category.find({isDeleted:false}).sort("-_id");
 
       const CategorySize = categorys.length;
 
