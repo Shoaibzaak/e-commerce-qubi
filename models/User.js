@@ -1,7 +1,8 @@
+// user.model.js
+
 const mongoose = require("mongoose");
-const encrypt = require("bcrypt");
-const moment = require("moment");
 const Schema = mongoose.Schema;
+
 const UserModel = new Schema(
   {
     firstName: {
@@ -17,16 +18,16 @@ const UserModel = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      required: true
+      required: true,
     },
     password: {
-      type: String
+      type: String,
     },
     otp: {
-      type: Number
+      type: Number,
     },
     otpExpiry: {
-      type: Number
+      type: Number,
     },
     isEmailConfirmed: {
       type: Boolean,
@@ -37,14 +38,18 @@ const UserModel = new Schema(
       default: false,
     },
     facebookId: {
-      type: String
+      type: String,
     },
     googleId: {
-      type: String
+      type: String,
     },
     accessToken: {
-      type: String
-    }
+      type: String,
+    },
+    address: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+    },
   },
   {
     timestamps: true,
@@ -52,28 +57,7 @@ const UserModel = new Schema(
   }
 );
 
-UserModel.set("toJSON", {
-  virtuals: false,
-  transform: (doc, ret, options) => {
-    delete ret.__v;
-    delete ret.password;
-  },
-});
-
-// UserModel.pre("save", function (next) {
-//   encrypt.genSalt(10, (error, salt) => {
-//     if (error) return console.log(error);
-//     encrypt.hash(this.password, salt, (error, hash) => {
-//       this.password = hash;
-//       next();
-//     });
-//   });
-// });
-UserModel.methods.comparePassword = async function (password) {
-  const match = await encrypt.compare(password, this.password);
-  if (match) return true;
-  return false;
-};
+// ... (rest of the code)
 
 const User = mongoose.model("User", UserModel);
 module.exports = User;

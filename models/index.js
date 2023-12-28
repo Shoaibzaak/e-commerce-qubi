@@ -6,6 +6,7 @@ module.exports = {
   Order: require("./Order"),
   Brand: require("./Brand"),
   Cart :require("./Cart"),
-  Contact :require("./Contact")
+  Contact :require("./Contact"),
+  Address :require("./Address")
  
 };
