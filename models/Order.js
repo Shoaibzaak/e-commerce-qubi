@@ -3,10 +3,19 @@ const Schema = mongoose.Schema;
 
 const orderModel = new Schema(
   {
-    products: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    }],
+    products: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          // required: true,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -24,7 +33,11 @@ const orderModel = new Schema(
       },
       // other payment details
     },
-    // other fields as needed
+    // status: {
+    //   type: String,
+    //   enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
+    //   default: "pending",
+    // },
   },
 
   {
