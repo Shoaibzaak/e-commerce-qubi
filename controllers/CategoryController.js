@@ -161,13 +161,21 @@ module.exports = {
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
     try {
-      const CategoryUser = await Model.Category.findByIdAndDelete(CategoryId);
-      if (!CategoryUser)
-        return res.badRequest("Category  Not Found in our records");
-      var message = "Category user deleted successfully";
-      res.ok(message, CategoryUser);
+        // Find the category by ID and update it to set isDeleted to true
+        const updatedCategory = await Model.Category.findByIdAndUpdate(
+            CategoryId,
+            { isDeleted: true },
+            { new: true } // To return the updated document
+        );
+
+        // If category is not found, return a bad request response
+        if (!updatedCategory)
+            return res.badRequest("Category not found in our records");
+
+        var message = "Category deleted successfully";
+        res.ok(message, updatedCategory);
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+        throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
 

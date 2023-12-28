@@ -127,13 +127,21 @@ getAllBrandUsers: catchAsync(async (req, res, next) => {
   declineBrand: catchAsync(async (req, res, next) => {
     var BrandId = req.params.id;
     try {
-      const BrandUser = await Model.Brand.findByIdAndDelete(BrandId);
-      if (!BrandUser)
-        return res.badRequest("Brand  Not Found in our records");
-      var message = "Brand user deleted successfully";
-      res.ok(message, BrandUser);
+        // Find the brand by ID and update it to set isDeleted to true
+        const updatedBrand = await Model.Brand.findByIdAndUpdate(
+            BrandId,
+            { isDeleted: true },
+            { new: true } // To return the updated document
+        );
+
+        // If brand is not found, return a bad request response
+        if (!updatedBrand)
+            return res.badRequest("Brand not found in our records");
+
+        var message = "Brand deleted successfully";
+        res.ok(message, updatedBrand);
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+        throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
 };
