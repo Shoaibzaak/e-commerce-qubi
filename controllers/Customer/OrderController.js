@@ -54,38 +54,81 @@ module.exports = {
 
   getAllOrderUser: catchAsync(async (req, res, next) => {
     console.log("Orderdetails is called");
-
     try {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
 
       if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-        // If pageNumber or limit is not a valid non-negative number, return a bad request response
         return res.badRequest("Invalid query parameters");
-        // return responseHelper.badRequest(res, "Invalid query parameters.");
       }
 
       const message = "Orderdetails found successfully";
 
       const skipValue = pageNumber * limit - limit;
-
       if (skipValue < 0) {
-        // If the calculated skip value is less than 0, return a bad request response
         return res.badRequest("Invalid combination of pageNumber and limit.");
       }
-      const OrdersTotal = await Model.Order.find();
-      const Orders = await Model.Order.find()
-        .skip(skipValue)
-        .limit(limit)
-        .sort("_id")
-        .populate({
-          path: 'items.product',   // the field in the Order schema where the product ID is stored
-          model: 'product' ,     // the name of the model (as defined in mongoose.model()) for the Product
-          // Optionally, if you want to select specific fields from the Product model:
-          select: 'name images price description'
-        });
 
-      const OrderSize = OrdersTotal.length;
+      // Aggregation pipeline to get orders with populated product details, payment, status, and item count
+      const Orders = await Model.Order.aggregate([
+        { $skip: skipValue },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: "products", // Assuming your Product model is named 'Product' in Mongoose and collection name is 'products'
+            localField: "items.product",
+            foreignField: "_id",
+            as: "itemDetails",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            payment: 1,
+            status: 1,
+            itemCount: { $size: "$items" },
+            itemDetails: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: {
+                  $mergeObjects: [
+                    "$$item",
+                    {
+                      productDetails: {
+                        $arrayElemAt: [
+                          {
+                            $map: {
+                              input: {
+                                $filter: {
+                                  input: "$itemDetails",
+                                  as: "detail",
+                                  cond: {
+                                    $eq: ["$$detail._id", "$$item.product"],
+                                  },
+                                },
+                              },
+                              as: "filtered",
+                              in: {
+                                name: "$$filtered.name",
+                                images: "$$filtered.images",
+                                description: "$$filtered.description",
+                              },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      ]);
+
+      const OrderSize = await Model.Order.countDocuments();
 
       const result = {
         Order: Orders,
@@ -94,14 +137,11 @@ module.exports = {
       };
 
       if (OrderSize === 0) {
-        // If no Orders are found, return a not found response
         return responseHelper.requestfailure(res, "Orderdetails do not exist.");
       }
 
-      // Return a success response with status code 200
       return responseHelper.success(res, result, message);
     } catch (error) {
-      // Return a failure response with status code 500
       responseHelper.requestfailure(res, error);
     }
   }),
