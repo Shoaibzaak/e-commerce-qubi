@@ -24,23 +24,25 @@ const upload = multer({ storage: userStorage });
 
 router.route("/register").post(Controller.UserAuthController.register);
 router
-  .route("/accontVerification")
+  .route("/userAccontVerification")
   .post(Controller.UserAuthController.accountVerification);
 router.route("/login").post(Controller.UserAuthController.login);
 router
-  .route("/forgetpassword")
+  .route("/userForgetpassword")
   .post(Controller.UserAuthController.forgetPassword);
 router
-  .route("/changepassword")
+  .route("/userChangepassword")
   .post(Authentication.UserAuth, Controller.UserAuthController.changePassword);
-router.route("/resendOtp").post(Controller.UserAuthController.resendOtp);
+router.route("/userResendOtp").post(Controller.UserAuthController.resendOtp);
 router
   .route("/updatePassword")
   .post(Controller.UserAuthController.updatePassword);
 
-router.route("/profile/setup").put(
-  upload.single('profilePic'),
-  Authentication.UserAuth,
-  Controller.UserAuthController.profileSetup
-);
+router
+  .route("/profile/setup")
+  .put(
+    upload.single("profilePic"),
+    Authentication.UserAuth,
+    Controller.UserAuthController.profileSetup
+  );
 module.exports = router;

@@ -46,12 +46,12 @@ module.exports = {
       let otpCode = {
         otp,
       };
-      // await Services.EmailService.sendEmail(
-      //   "public/otpVerification.html",
-      //   otpCode,
-      //   email,
-      //   "User Account Email Verification | vagabond"
-      // );
+      await Services.EmailService.sendEmail(
+        "public/otpVerification.html",
+        otpCode,
+        email,
+        "User Account Email Verification "
+      );
       return res.ok(
         "Registration successful. A verification code has been sent to your email.",
         User
@@ -168,57 +168,62 @@ module.exports = {
 
   forgetPassword: catchAsync(async (req, res, next) => {
     const { email } = req.body;
-    if (!email) return res.badRequest(Message.badRequest);
-    let user;
-    user = await Model.User.findOne({ email });
 
-    if (!user) throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
-    // if (user.isEmailConfirmed == false) throw new HTTPError(Status.BAD_REQUEST, "Your account is not verfied");
-    const otp = otpService.issue();
-    const otpExpiryCode = moment().add(10, "minutes").valueOf();
-    const tempPassword = referralCodes.generate({
-      length: 8,
-      charset: referralCodes.charset("alphanumeric"),
-    })[0];
-    // console.log(tempPassword,"tempPassword===>")
-    encrypt.genSalt(10, (error, salt) => {
-      if (error) return console.log(error);
-      encrypt.hash(tempPassword, salt, async (error, hash) => {
-        // if (user) {
+    if (!email) {
+        return res.badRequest(Message.badRequest);
+    }
+
+    try {
+        let user = await Model.User.findOne({ email });
+
+        if (!user) {
+            throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
+        }
+
+        // Generate OTP and its expiry
+        const otp = otpService.issue();
+        const otpExpiryCode = moment().add(10, "minutes").valueOf();
+
+        // Generate a temporary password
+        const tempPassword = referralCodes.generate({
+            length: 8,
+            charset: referralCodes.charset("alphanumeric"),
+        })[0];
+
+        // Hash the temporary password
+        const salt = await encrypt.genSalt(10);
+        const hash = await encrypt.hash(tempPassword, salt);
+
+        // Update user's password in the database
         await Model.User.findOneAndUpdate(
-          { _id: user._id },
-          { $set: { password: hash } }
+            { _id: user._id },
+            { $set: { password: hash } }
         );
-        //   // const token = `GHA ${Services.JwtService.issue({
-        //   //   id: Services.HashService.encrypt(user._id),
-        //   // })}`;
-        //   // user = { ...user._doc, usertype: "User" };
-        //   // return res.ok("Password updated successfully and", user);
-        // }
-      });
-    });
 
-    // if (user) {
-    //   await Model.User.findOneAndUpdate({ _id: user._id }, { $set: { otp: otp, otpExpiry: otpExpiryCode } });
-    // }
-    let replacements = {
-      // otp,
-      tempPassword,
-    };
-    // const token =  Services.JwtService.issue({
-    //   id: Services.HashService.encrypt(user._id),
-    // })
-    // console.log(token)
-    await Services.EmailService.sendEmail(
-      "public/otpResetPass.html",
-      replacements,
-      email,
-      "Forget Password | In VAGABOND"
-    );
-    return res.ok(
-      "Temporary password  has been sent to your registered email."
-    );
-  }),
+        // Send email with temporary password
+        const replacements = {
+            tempPassword,
+        };
+
+        await Services.EmailService.sendEmail(
+            "public/otpResetPass.html",
+            replacements,
+            email,
+            "Forget Password "
+        );
+
+        return res.ok("Temporary password has been sent to your registered email.");
+
+    } catch (error) {
+        // Handle errors
+        if (error instanceof HTTPError) {
+            return res.status(error.status).send(error.message);
+        }
+        console.error(error); // Log other unexpected errors for debugging
+        return res.status(Status.INTERNAL_SERVER_ERROR).send(Message.serverError);
+    }
+}),
+
   updatePassword: catchAsync(async (req, res, next) => {
     const { otp, newPassword } = req.body;
     if (!otp || !newPassword)
@@ -264,6 +269,7 @@ module.exports = {
   changePassword: catchAsync(async (req, res, next) => {
     // this user get from authenticated user
     const verifiedUser = req.user;
+    console.log(verifiedUser)
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword)
       return res.status(400).json({
