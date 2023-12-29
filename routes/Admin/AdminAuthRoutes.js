@@ -25,17 +25,17 @@ const upload = multer({ storage: userStorage });
 
 router
   .route("/accontVerification")
-  .post(Controller.UserAuthController.accountVerification);
+  .post(Controller.AdminAuthController.accountVerification);
 router
   .route("/forgetpassword")
-  .post(Controller.UserAuthController.forgetPassword);
+  .post(Controller.AdminAuthController.forgetPassword);
 router
   .route("/changepassword")
-  .post(Authentication.UserAuth, Controller.UserAuthController.changePassword);
-router.route("/resendOtp").post(Controller.UserAuthController.resendOtp);
+  .post(Authentication.UserAuth, Controller.AdminAuthController.changePassword);
+router.route("/resendOtp").post(Controller.AdminAuthController.resendOtp);
 router
   .route("/updatePassword")
-  .post(Controller.UserAuthController.updatePassword);
+  .post(Controller.AdminAuthController.updatePassword);
 
 // router.route("/profile/setup").post(
 //   upload.fields([
@@ -50,7 +50,7 @@ router
 //   ]),
 //   Controller.AuthController.setupProfile
 // );
-router.route("/registerAdmin").post(Controller.UserAuthController.registerAdmin);
-router.route("/loginAdmin").post(Controller.UserAuthController.loginAdmin);
+router.route("/registerAdmin").post(Controller.AdminAuthController.registerAdmin);
+router.route("/loginAdmin").post(Controller.AdminAuthController.loginAdmin);
 
 module.exports = router;

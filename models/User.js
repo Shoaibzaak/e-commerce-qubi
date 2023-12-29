@@ -23,6 +23,12 @@ const UserModel = new Schema(
     password: {
       type: String,
     },
+    phoneNumber: {
+      type: String,
+    },
+    profilePic: {
+      type: String,
+    },
     otp: {
       type: Number,
     },

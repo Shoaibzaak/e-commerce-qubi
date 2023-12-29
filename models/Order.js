@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const orderModel = new Schema(
   {
-    products: [
+    items: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
@@ -33,11 +33,11 @@ const orderModel = new Schema(
       },
       // other payment details
     },
-    // status: {
-    //   type: String,
-    //   enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
-    //   default: "pending",
-    // },
+    status: {
+      type: String,
+      enum: ["Pending", "Completed", "Cancel"],
+      default: "Pending",
+    },
   },
 
   {

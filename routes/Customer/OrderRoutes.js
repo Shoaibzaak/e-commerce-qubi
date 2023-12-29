@@ -6,9 +6,9 @@ const multer = require("multer");
 const Authentication = require("../../policy/index");
 
 const userStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./public/images");
-  },
+  // destination: (req, file, cb) => {
+  //   cb(null, "/tmp");
+  // },
   filename: (req, file, cb) => {
     cb(
       null,
@@ -31,37 +31,24 @@ var upload = multer({ //multer settings
   }
 })
 
-//post custom Family 
-router.route("/createBrand").post(
-//   upload.fields([
-//     {
-//       name: "images",
-//       maxCount: 10,
-//     },
-//   ]),
-  Authentication.AdminAuth,
-  Controller.BrandController.createBrand);
+//post custom Order 
+router.route("/createOrder").post(
+  // Authentication.UserAuth,
+  Controller.OrderController.createOrder);
 
-//update Family
-router.route("/updateBrand").post(
-  Authentication.AdminAuth,
-  Controller.BrandController.updateBrand);
+//update Order
+router.route("/updateOrder").post(
+  Authentication.UserAuth,
+  Controller.OrderController.updateOrder);
 
-//delete Family
-router.route("/deleteBrand/:id").delete(
-  Authentication.AdminAuth,
-  Controller.BrandController.declineBrand);
+//delete Order
+router.route("/deleteOrder/:id").delete(
+  Authentication.UserAuth,
+  Controller.OrderController.declineOrder);
+  router.route("/getAllOrder").get(
+    // Authentication.UserAuth,
+    Controller.OrderController.getAllOrderUser);
 
-
-// get Family by id
-router.route("/findBrandById/:id").get(
-  Authentication.AdminAuth,
-  Controller.BrandController.getBrandUser);
-
-  // get all  Familys with details
-router.route("/getAllBrands").get(
-  Authentication.AdminAuth,
-  Controller.BrandController.getAllBrandUsers);
 
 
 

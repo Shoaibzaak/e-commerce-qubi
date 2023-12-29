@@ -4,7 +4,7 @@ const router = express.Router();
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-const Authentication = require("../../policy/index");
+const Authentication = require("../../policy");
 const userStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Check if the directory exists, if not create it
@@ -38,17 +38,9 @@ router
   .route("/updatePassword")
   .post(Controller.UserAuthController.updatePassword);
 
-// router.route("/profile/setup").post(
-//   upload.fields([
-//     {
-//       name: "profilePic",
-//       maxCount: 1,
-//     },
-//     {
-//       name: "resume",
-//       maxCount: 1,
-//     },
-//   ]),
-//   Controller.AuthController.setupProfile
-// );
+router.route("/profile/setup").put(
+  upload.single('profilePic'),
+  Authentication.UserAuth,
+  Controller.UserAuthController.profileSetup
+);
 module.exports = router;

@@ -8,9 +8,9 @@ const HTTPError = require("../../utils/CustomError");
 const moment = require("moment");
 const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
-const bcrypt = require("bcrypt");
+const encrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
-
+const cloudUpload = require("../../cloudinary");
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -46,12 +46,12 @@ module.exports = {
       let otpCode = {
         otp,
       };
-      await Services.EmailService.sendEmail(
-        "public/otpVerification.html",
-        otpCode,
-        email,
-        "User Account Email Verification | vagabond"
-      );
+      // await Services.EmailService.sendEmail(
+      //   "public/otpVerification.html",
+      //   otpCode,
+      //   email,
+      //   "User Account Email Verification | vagabond"
+      // );
       return res.ok(
         "Registration successful. A verification code has been sent to your email.",
         User
@@ -311,6 +311,73 @@ module.exports = {
       }
     });
   }),
+  profileSetup: async (req, res, next) => {
+    try {
+      const userId = req.user._id;
+      const { address, userData } = req.body;
+      const profilePicPath = req.file?.path;
+     console.log(userData,"userData")
+      // Fetch the user
+      const user = await Model.User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
+      // Update profile picture if provided
+      let profilePicUrl = user.profilePic;
+      if (profilePicPath) {
+        profilePicUrl = await cloudUpload
+          .cloudinaryUpload(profilePicPath)
+          .catch((err) => {
+            throw new Error(`Error uploading to Cloudinary: ${err.message}`);
+          });
+        user.profilePic = profilePicUrl;
+      }
 
+      // Handle userData update
+      if (userData) {
+        const updatedData = await Model.User.findByIdAndUpdate(
+          userId,
+          JSON.parse(userData),
+          { new: true }
+        );
+        console.log(updatedData, "updatedData");
+        // TODO: Handle scenarios where the update might not be successful
+      }
+
+      // Handle address update
+      if (address) {
+        const addressData = JSON.parse(address);
+        let savedAddress;
+
+        // Check if user already has an address
+        if (user.address) {
+          savedAddress = await Model.Address.findByIdAndUpdate(
+            user.address,
+            addressData,
+            { new: true }
+          );
+        } else {
+          savedAddress = await new Model.Address(addressData).save();
+        }
+
+        user.address = savedAddress._id;
+      }
+
+      // Save user updates
+      await user.save();
+
+      return res.status(200).json({
+        message: "Profile updated successfully",
+        user: {
+          ...user._doc,
+          address: address ? JSON.parse(address) : {},
+          profilePic: profilePicUrl,
+        },
+      });
+    } catch (error) {
+      console.error("Error in profileSetup:", error);
+      next(error);
+    }
+  },
 };
