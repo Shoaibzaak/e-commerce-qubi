@@ -70,6 +70,10 @@ const productModel = new Schema(
       enum: ["In Stock", "Out Stock", "Low Stock"],
       default: "In Stock",
     },
+    quantity: {
+      type: Number,
+      min: 0,
+    },
     discount: {
       type: Number,
       min: 0,

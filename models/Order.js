@@ -14,6 +14,10 @@ const orderModel = new Schema(
           type: Number,
           default: 1,
         },
+        variationId: {  // Reference the variation ID here
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product.variations",
+        },
       },
     ],
     user: {

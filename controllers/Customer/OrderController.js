@@ -34,21 +34,113 @@ module.exports = {
   createOrder: catchAsync(async (req, res, next) => {
     console.log("createOrder is called");
     try {
-      const { items, user, payment } = req.body;
-      const newOrder = new Model.Order({
-        items: items.map((item) => ({
-          product: item.product, // Assuming item.product is the product ID
-          quantity: item.quantity || 1, // Default to 1 if quantity is not provided
-        })),
-        user,
-        payment,
+      const orderItems = req.body.items;
+      console.log(orderItems, "orderItems");
+
+      if (!Array.isArray(orderItems)) {
+        return res.status(400).json({ error: "Invalid request format" });
+      }
+
+      if (orderItems.length === 0) {
+        return res
+          .status(400)
+          .json({ error: "Order must contain at least one item" });
+      }
+
+      const productsPromises = orderItems.map(async (orderItem) => {
+        const { product, quantity, variationId } = orderItem;
+
+        const productDetail = await Model.Product.findById(product);
+
+        if (!productDetail) {
+          throw new Error(`Product with this ID not found`);
+        }
+
+        const productType = productDetail.productType;
+
+        if (productType === "variations") {
+          const targetVariation = productDetail.variations.find(
+            (variation) => variation._id.toString() === variationId.toString()
+          );
+
+          if (!targetVariation) {
+            throw new Error(
+              `Variation with ID ${variationId} not found for product ${product}`
+            );
+          }
+
+          if (targetVariation.quantity < quantity) {
+            throw new Error(
+              `Insufficient quantity available for variation with ID ${variationId} for product ${product}`
+            );
+          }
+
+          targetVariation.quantity -= quantity;
+          await productDetail.save();
+
+          return {
+            productId: productDetail._id,
+            variationId: targetVariation._id,
+            quantity,
+          };
+        } else if (productType === "simple") {
+          if (productDetail.quantity < quantity) {
+            throw new Error(
+              `Insufficient quantity available for product with ID ${product}`
+            );
+          }
+
+          productDetail.quantity -= quantity;
+          await productDetail.save();
+        }
+
+        return { productId: productDetail._id, quantity };
       });
 
-      const savedOrder = await newOrder.save();
+      const products = await Promise.all(productsPromises);
 
-      res.status(200).json(savedOrder);
+      const order = new Model.Order({
+        items: products.map(({ productId, variationId, quantity }) => ({
+          product: productId,
+          // variation: variationId,
+          quantity,
+        })),
+        user: req.body.user,
+        payment: req.body.payment,
+      });
+
+      await order.save();
+
+      res.status(201).json({ message: "Order created successfully", order });
     } catch (error) {
-      responseHelper.requestfailure(res, error);
+      console.error(error);
+
+      if (error.message.includes("Invalid request format")) {
+        return res.status(400).json({ error: "Invalid request format" });
+      }
+
+      if (error.message.includes("Order must contain at least one item")) {
+        return res
+          .status(400)
+          .json({ error: "Order must contain at least one item" });
+      }
+
+      if (error.message.includes("Product with this ID not found")) {
+        return res.status(404).json({ error: error.message });
+      }
+
+      if (
+        error.message.includes("Insufficient quantity available") ||
+        error.message.includes("Variation with ID")
+      ) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      if (error.message.includes("Variation not found")) {
+        return res.status(404).json({ error: error.message });
+      }
+
+      res.status(500).json({ error: "Internal Server Error" });
     }
   }),
 
