@@ -432,53 +432,60 @@ module.exports = {
     try {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
-
+  
       if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid query parameters" });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid query parameters",
+        });
       }
-
+  
       const message = "Customers found successfully";
-
+  
       const skipValue = pageNumber * limit - limit;
       if (skipValue < 0) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Invalid combination of pageNumber and limit.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Invalid combination of pageNumber and limit.",
+        });
       }
-
-      // Aggregation pipeline to get customers with any associated details (e.g., orders, transactions, etc.)
+  
+      // Aggregation pipeline to get only customers where isDeleted is false
       const Customers = await Model.User.aggregate([
+        { $match: { isDeleted: false } },
         { $skip: skipValue },
         { $limit: limit },
         // Add any additional stages or lookups you need here
       ]);
-
-      const CustomerSize = await Model.User.countDocuments();
-
+  
+      const CustomerSize = await Model.User.countDocuments({ isDeleted: false });
+  
       const result = {
         Customers: Customers,
         totalCustomers: CustomerSize,
         limit: limit,
       };
-
+  
       if (CustomerSize === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Customers do not exist." });
+        return res.status(404).json({
+          success: false,
+          message: "Customers do not exist.",
+        });
       }
-
-      return res
-        .status(200)
-        .json({ success: true, data: result, message: message });
+  
+      return res.status(200).json({
+        success: true,
+        data: result,
+        message: message,
+      });
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message });
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   }),
+  
   // Update a User with a particular ID
   updateUser: catchAsync(async (req, res, next) => {
     const userId = req.params.id;
@@ -501,4 +508,50 @@ module.exports = {
       throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
+  // Retrieve a single User with a particular ID
+getSingleUser: catchAsync(async (req, res, next) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await Model.User.findById(userId);
+
+    if (!user) {
+      return res.badRequest("User Not Found in our records");
+    }
+
+    res.ok("User retrieved successfully", user);
+  } catch (err) {
+    throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+  }
+}),
+// Delete a single User with a particular ID
+// Delete or Temporarily Mark a User based on a condition
+deleteUser: catchAsync(async (req, res, next) => {
+  const userId = req.params.id;
+  const { permanent } = req.query; // Assuming the query parameter "permanent" is used to determine the delete type
+
+  try {
+    let user;
+
+    if (permanent === 'true') { // Delete permanently based on the condition
+      user = await Model.User.findByIdAndDelete(userId);
+    } else { // Mark as temporarily deleted (update a field, e.g., isDeleted)
+      user = await Model.User.findByIdAndUpdate(
+        userId,
+        { isDeleted: true },
+        { new: true, runValidators: true }
+      );
+    }
+
+    if (!user) {
+      return res.badRequest("User Not Found in our records");
+    }
+
+    res.ok(permanent === 'true' ? "User deleted permanently" : "User marked as temporarily deleted", user);
+  } catch (err) {
+    throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+  }
+}),
+
+
 };

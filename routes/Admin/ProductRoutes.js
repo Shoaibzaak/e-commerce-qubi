@@ -68,6 +68,10 @@ router.route("/findProductById/:id").get(
 router.route("/getAllProducts").get(
   Authentication.AdminAuth,
   Controller.ProductController.getAllProductAdmin);
+    // get all  Products with details
+router.route("/getAllWhishLists").get(
+  Authentication.AdminAuth,
+  Controller.ProductController.getAllWhishList);
 
 //=======================  cutomer app side product api's will be start from this ===================    //
   router.route("/getAllProductsUser").get(

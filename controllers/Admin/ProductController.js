@@ -151,6 +151,57 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
+  getAllWhishList: catchAsync(async (req, res, next) => {
+    console.log("WhisListdetails is called");
+    try {
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
+        // If pageNumber or limit is not a valid non-negative number, return a bad request response
+        return res.badRequest("Invalid query parameters");
+        // return responseHelper.badRequest(res, "Invalid query parameters.");
+      }
+
+      const message = "WhishListdetails found successfully";
+
+      const skipValue = pageNumber * limit - limit;
+
+      if (skipValue < 0) {
+        // If the calculated skip value is less than 0, return a bad request response
+        return res.badRequest("Invalid combination of pageNumber and limit.");
+      }
+      const productsTotal = await Model.Product.find({isWhished:true});
+      const products = await Model.Product.find({isWhished:true})
+        .skip(skipValue)
+        .limit(limit)
+        .sort("_id")
+        .populate("type")
+        .populate("brand");
+
+      const ProductSize = productsTotal.length;
+
+      const result = {
+        Product: products,
+        totalProducts: ProductSize,
+        limit: limit,
+      };
+
+      if (ProductSize === 0) {
+        // If no products are found, return a not found response
+        return responseHelper.requestfailure(
+          res,
+          "WhishListdetails do not exist."
+        );
+      }
+
+      // Return a success response with status code 200
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      // Return a failure response with status code 500
+      responseHelper.requestfailure(res, error);
+    }
+  }),
   getAllProductUser: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
 
