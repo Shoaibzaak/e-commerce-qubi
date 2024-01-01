@@ -514,7 +514,7 @@ getSingleUser: catchAsync(async (req, res, next) => {
   const userId = req.params.id;
 
   try {
-    const user = await Model.User.findById(userId);
+    const user = await Model.User.findById(userId).populate("address");
 
     if (!user) {
       return res.badRequest("User Not Found in our records");
