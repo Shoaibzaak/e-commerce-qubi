@@ -454,6 +454,7 @@ module.exports = {
       const Customers = await Model.User.aggregate([
         { $match: { isDeleted: false } },
         { $skip: skipValue },
+        { $sort: { createdAt: -1 } },
         { $limit: limit },
         // Add any additional stages or lookups you need here
       ]);
