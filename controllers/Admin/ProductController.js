@@ -99,30 +99,7 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
-
-  // Get a list of Products
-  getProductList: async (req, res) => {
-    console.log("getProductList called");
-    var ProductData = req.body;
-
-    try {
-      var result = await ProductHelper.getProductList(
-        ProductData.sortproperty,
-        ProductData.sortorder,
-        ProductData.offset,
-        ProductData.limit,
-        ProductData.query
-      );
-
-      var message = "Successfully loaded";
-
-      responseHelper.success(res, result, message);
-    } catch (err) {
-      responseHelper.requestfailure(res, err);
-    }
-  },
-
-  // Get all Product users with full details
+ // Get all Product users with full details
   getAllProductAdmin: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
     try {
@@ -275,3 +252,4 @@ module.exports = {
     }
   }),
 };
+

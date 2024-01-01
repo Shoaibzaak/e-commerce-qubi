@@ -72,5 +72,9 @@ router.route("/uploadAdminProfilePic").post(
   ]),
   Controller.AdminAuthController.uploadAdminProfilePic
 );
+router.route("/updateCustomer/:id").put(
+  Authentication.AdminAuth,
+  Controller.AdminAuthController.updateUser
+);
 
 module.exports = router;

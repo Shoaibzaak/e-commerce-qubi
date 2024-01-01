@@ -10,9 +10,8 @@ const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
 const bcrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
-const cloudUpload=require("../../cloudinary")
+const cloudUpload = require("../../cloudinary");
 module.exports = {
- 
   accountVerification: catchAsync(async (req, res, next) => {
     const { otp } = req.body;
     if (!otp) throw new HTTPError(Status.BAD_REQUEST, Message.required);
@@ -265,7 +264,7 @@ module.exports = {
       next(err);
     }
   },
- 
+
   //   try {
   //     const { email, password } = req.body;
   //     if (!email || !password)
@@ -365,22 +364,21 @@ module.exports = {
       const adminDetails = {
         _id: user._id,
         email: user?.email,
-        firstName:user?.firstName,
-        lastName:user?.lastName,
-        profilePic:user?.profilePic
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        profilePic: user?.profilePic,
         // Add other fields as needed
       };
 
       return res.ok("Admin details retrieved successfully", {
         admin: adminDetails,
       });
-
     } catch (err) {
       console.error(err);
       next(err);
     }
   },
- uploadAdminProfilePic: catchAsync(async (req, res, next) => {
+  uploadAdminProfilePic: catchAsync(async (req, res, next) => {
     const userData = req.body;
     console.log("uploadProfilePic has been called");
     try {
@@ -425,9 +423,7 @@ module.exports = {
         res.status(err.statusCode).json({ error: err.message });
       } else {
         // For unhandled errors, return a generic 500 Internal Server Error
-        res
-          .status(Status.INTERNAL_SERVER_ERROR)
-          .json({ error:err.message} );
+        res.status(Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
       }
     }
   }),
@@ -438,14 +434,21 @@ module.exports = {
       const limit = parseInt(req.query.limit) || 10;
 
       if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-        return res.status(400).json({ success: false, message: "Invalid query parameters" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid query parameters" });
       }
 
       const message = "Customers found successfully";
 
       const skipValue = pageNumber * limit - limit;
       if (skipValue < 0) {
-        return res.status(400).json({ success: false, message: "Invalid combination of pageNumber and limit." });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "Invalid combination of pageNumber and limit.",
+          });
       }
 
       // Aggregation pipeline to get customers with any associated details (e.g., orders, transactions, etc.)
@@ -464,14 +467,38 @@ module.exports = {
       };
 
       if (CustomerSize === 0) {
-        return res.status(404).json({ success: false, message: "Customers do not exist." });
+        return res
+          .status(404)
+          .json({ success: false, message: "Customers do not exist." });
       }
 
-      return res.status(200).json({ success: true, data: result, message: message });
+      return res
+        .status(200)
+        .json({ success: true, data: result, message: message });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
   }),
+  // Update a User with a particular ID
+  updateUser: catchAsync(async (req, res, next) => {
+    const userId = req.params.id;
+    const updateData = req.body; // Assuming the request body contains the updated data
 
+    try {
+      const updatedUser = await Model.User.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true, runValidators: true }
+      );
 
+      if (!updatedUser) {
+        return res.badRequest("User Not Found in our records");
+      }
+
+      const message = "User updated successfully";
+      res.ok(message, updatedUser);
+    } catch (err) {
+      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+    }
+  }),
 };
