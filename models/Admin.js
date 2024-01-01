@@ -19,6 +19,9 @@ const AdminModel = new Schema(
       trim: true,
       required: true,
     },
+    profilePic:{
+       type:String, 
+    },
     password: {
       type: String,
     },

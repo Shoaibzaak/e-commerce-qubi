@@ -22,7 +22,6 @@ const userStorage = multer.diskStorage({
 });
 const upload = multer({ storage: userStorage });
 
-
 // router
 //   .route("/accontVerification")
 //   .post(Controller.AdminAuthController.accountVerification);
@@ -50,7 +49,28 @@ const upload = multer({ storage: userStorage });
 //   ]),
 //   Controller.AuthController.setupProfile
 // );
-router.route("/registerAdmin").post(Controller.AdminAuthController.registerAdmin);
+router
+  .route("/registerAdmin")
+  .post(Controller.AdminAuthController.registerAdmin);
 router.route("/loginAdmin").post(Controller.AdminAuthController.loginAdmin);
+router
+  .route("/getAdminById/:id")
+  .get(Authentication.AdminAuth, Controller.AdminAuthController.getAdminById);
+router
+  .route("/getAllCustomers")
+  .get(
+    Authentication.AdminAuth,
+    Controller.AdminAuthController.getAllCustomersAdmin
+  );
+router.route("/uploadAdminProfilePic").post(
+  Authentication.AdminAuth,
+  upload.fields([
+    {
+      name: "profilePic",
+      maxCount: 1,
+    },
+  ]),
+  Controller.AdminAuthController.uploadAdminProfilePic
+);
 
 module.exports = router;

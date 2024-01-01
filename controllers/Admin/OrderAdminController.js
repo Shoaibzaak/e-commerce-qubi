@@ -104,6 +104,18 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
+   // Delete a Order user
+   declineAdminOrder: catchAsync(async (req, res, next) => {
+    var OrderId = req.params.id;
+    try {
+      const OrderUser = await Model.Order.findByIdAndDelete(OrderId);
+      if (!OrderUser) return res.badRequest("Order  Not Found in our records");
+      var message = "Order user deleted successfully";
+      res.ok(message, OrderUser);
+    } catch (err) {
+      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+    }
+  }),
 
 
 };

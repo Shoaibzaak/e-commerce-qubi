@@ -41,10 +41,7 @@ router.route("/updateOrder").post(
   Authentication.UserAuth,
   Controller.OrderController.updateOrder);
 
-//delete Order
-router.route("/deleteOrder/:id").delete(
-  Authentication.UserAuth,
-  Controller.OrderController.declineOrder);
+
   router.route("/getAllOrder").get(
     // Authentication.UserAuth,
     Controller.OrderController.getAllOrderUser);

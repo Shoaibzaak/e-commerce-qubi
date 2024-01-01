@@ -10,7 +10,7 @@ const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
 const bcrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
-
+const cloudUpload=require("../../cloudinary")
 module.exports = {
  
   accountVerification: catchAsync(async (req, res, next) => {
@@ -265,7 +265,7 @@ module.exports = {
       next(err);
     }
   },
-  // loginAdmin: async (req, res, next) => {
+ 
   //   try {
   //     const { email, password } = req.body;
   //     if (!email || !password)
@@ -347,4 +347,131 @@ module.exports = {
       next(err);
     }
   },
+  getAdminById: async (req, res, next) => {
+    try {
+      const adminId = req.params.id; // Assuming the admin ID is passed as a route parameter
+
+      if (!adminId) {
+        throw new HTTPError(Status.BAD_REQUEST, "Admin ID is required");
+      }
+
+      let user = await Model.Admin.findById(adminId);
+
+      if (!user) {
+        throw new HTTPError(Status.NOT_FOUND, "Admin not found");
+      }
+
+      // Return admin details excluding the password
+      const adminDetails = {
+        _id: user._id,
+        email: user?.email,
+        firstName:user?.firstName,
+        lastName:user?.lastName,
+        profilePic:user?.profilePic
+        // Add other fields as needed
+      };
+
+      return res.ok("Admin details retrieved successfully", {
+        admin: adminDetails,
+      });
+
+    } catch (err) {
+      console.error(err);
+      next(err);
+    }
+  },
+ uploadAdminProfilePic: catchAsync(async (req, res, next) => {
+    const userData = req.body;
+    console.log("uploadProfilePic has been called");
+    try {
+      // Check if profile picture file is present
+      if (
+        !req.files ||
+        !req.files.profilePic ||
+        req.files.profilePic.length === 0
+      ) {
+        console.log("No profile pic is selected");
+        return res.badRequest("No profile pic is selected");
+      }
+
+      const file = req.files.profilePic[0]; // Assuming you only want to handle one profile picture
+      const { path } = file;
+
+      // Upload the file to Cloudinary
+      const cloudinaryResult = await cloudUpload.cloudinaryUpload(path);
+      // Update user model with the image URL
+      const result = await Model.Admin.findByIdAndUpdate(
+        { _id: userData.userId },
+        {
+          profilePic: cloudinaryResult,
+        }, // Assuming 'profilePic' is a field in your user model
+        { new: true }
+      );
+
+      if (!result) {
+        console.log("User not found");
+        throw new HTTPError(Status.NOT_FOUND, "User not found");
+      }
+
+      const message = "Profile picture uploaded successfully";
+      console.log(message);
+      res.ok(message, result);
+    } catch (err) {
+      // Log the error for debugging purposes
+      console.error(err);
+
+      // Handle specific HTTP errors
+      if (err instanceof HTTPError) {
+        res.status(err.statusCode).json({ error: err.message });
+      } else {
+        // For unhandled errors, return a generic 500 Internal Server Error
+        res
+          .status(Status.INTERNAL_SERVER_ERROR)
+          .json({ error:err.message} );
+      }
+    }
+  }),
+  getAllCustomersAdmin: catchAsync(async (req, res, next) => {
+    console.log("Fetching customers is called");
+    try {
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
+        return res.status(400).json({ success: false, message: "Invalid query parameters" });
+      }
+
+      const message = "Customers found successfully";
+
+      const skipValue = pageNumber * limit - limit;
+      if (skipValue < 0) {
+        return res.status(400).json({ success: false, message: "Invalid combination of pageNumber and limit." });
+      }
+
+      // Aggregation pipeline to get customers with any associated details (e.g., orders, transactions, etc.)
+      const Customers = await Model.User.aggregate([
+        { $skip: skipValue },
+        { $limit: limit },
+        // Add any additional stages or lookups you need here
+      ]);
+
+      const CustomerSize = await Model.User.countDocuments();
+
+      const result = {
+        Customers: Customers,
+        totalCustomers: CustomerSize,
+        limit: limit,
+      };
+
+      if (CustomerSize === 0) {
+        return res.status(404).json({ success: false, message: "Customers do not exist." });
+      }
+
+      return res.status(200).json({ success: true, data: result, message: message });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  }),
+
+
 };
