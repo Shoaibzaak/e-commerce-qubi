@@ -6,6 +6,7 @@ router.use("/familyMember", Routes.FamilyRoutes);
 router.use("/product", Routes.ProductRoutes);
 router.use("/category", Routes.CategoryRoutes);
 router.use("/brand", Routes.BrandRoutes);
+router.use("/order", Routes.OrderAdminRoutes);
 
 
 /*   Matt routes  */

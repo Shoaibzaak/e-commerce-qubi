@@ -4,6 +4,7 @@ module.exports = {
   CategoryRoutes: require("./Admin/CategoryRoutes"),
   ProductRoutes: require("./Admin/ProductRoutes"),
   BrandRoutes: require("./Admin/BrandRoutes"),
+  OrderAdminRoutes: require("./Admin/OrderAdminRoutes"),
 
 
 /*   Matt routes  */   

@@ -35,7 +35,6 @@ module.exports = {
     console.log("createOrder is called");
     try {
       const orderItems = req.body.items;
-      console.log(orderItems, "orderItems");
 
       if (!Array.isArray(orderItems)) {
         return res.status(400).json({ error: "Invalid request format" });
