@@ -77,11 +77,11 @@ router.route("/updateCustomer/:id").put(
   Controller.AdminAuthController.updateUser
 );
 router.route("/getSingleUser/:id").get(
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.AdminAuthController.getSingleUser
 );
 router.route("/deleteSingleUser/:id").delete(
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.AdminAuthController.deleteUser
 );
 module.exports = router;
