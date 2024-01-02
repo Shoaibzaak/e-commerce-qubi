@@ -54,7 +54,7 @@ router
   .post(Controller.AdminAuthController.registerAdmin);
 router.route("/loginAdmin").post(Controller.AdminAuthController.loginAdmin);
 router
-  .route("/getAdminById/:id")
+  .route("/getAdminById")
   .get(Authentication.AdminAuth, Controller.AdminAuthController.getAdminById);
 router
   .route("/getAllCustomers")

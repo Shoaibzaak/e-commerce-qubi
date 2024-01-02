@@ -19,8 +19,12 @@ const AdminModel = new Schema(
       trim: true,
       required: true,
     },
-    profilePic:{
-       type:String, 
+    role: {
+      type: String,
+      default:"admin"
+    },
+    profilePic: {
+      type: String,
     },
     password: {
       type: String,

@@ -348,8 +348,8 @@ module.exports = {
   },
   getAdminById: async (req, res, next) => {
     try {
-      const adminId = req.params.id; // Assuming the admin ID is passed as a route parameter
-
+      const admin = req.user; // Assuming the admin ID is passed as a route parameter
+      const adminId= admin._id
       if (!adminId) {
         throw new HTTPError(Status.BAD_REQUEST, "Admin ID is required");
       }
@@ -367,6 +367,7 @@ module.exports = {
         firstName: user?.firstName,
         lastName: user?.lastName,
         profilePic: user?.profilePic,
+        role: user?.role,
         // Add other fields as needed
       };
 
