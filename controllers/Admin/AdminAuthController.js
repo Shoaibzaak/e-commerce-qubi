@@ -421,6 +421,7 @@ module.exports = {
           lastName: userData.lastName,
           email: userData.email,
           phoneNumber: userData.phoneNumber,
+          bio: userData.bio,
           address: user.address
         },
         { new: true, runValidators: true }
