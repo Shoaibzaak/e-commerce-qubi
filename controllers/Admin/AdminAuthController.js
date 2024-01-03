@@ -368,6 +368,9 @@ module.exports = {
         lastName: user?.lastName,
         profilePic: user?.profilePic,
         role: user?.role,
+        address: user?.address,
+        phoneNumber: user?.phoneNumber,
+
         // Add other fields as needed
       };
 
@@ -422,7 +425,7 @@ module.exports = {
           email: userData.email,
           phoneNumber: userData.phoneNumber,
           bio: userData.bio,
-          address: user.address
+          address: user.address,
         },
         { new: true, runValidators: true }
       );
