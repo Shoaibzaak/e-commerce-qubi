@@ -438,17 +438,11 @@ module.exports = {
       const message = "Admin Data updated successfully";
       console.log(message);
       res.ok(message, result);
-    } catch (err) {
-      // Log the error for debugging purposes
-      console.error(err);
-
-      // Handle specific HTTP errors
-      if (err instanceof HTTPError) {
-        res.status(err.statusCode).json({ error: err.message });
-      } else {
-        // For unhandled errors, return a generic 500 Internal Server Error
-        res.status(Status.INTERNAL_SERVER_ERROR).json({ error: err.message });
-      }
+    }catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
     }
   }),
   getAllCustomersAdmin: catchAsync(async (req, res, next) => {
