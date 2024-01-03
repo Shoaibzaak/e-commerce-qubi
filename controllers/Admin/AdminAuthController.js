@@ -370,6 +370,7 @@ module.exports = {
         role: user?.role,
         address: user?.address,
         phoneNumber: user?.phoneNumber,
+        bio: user?.bio,
 
         // Add other fields as needed
       };
