@@ -2,17 +2,13 @@ const express = require("express");
 const Controller = require("../../controllers/index");
 const router = express.Router();
 const path = require("path");
-const multer = require("multer");
+const Multer = require("multer");
 const fs = require("fs");
 const Authentication = require("../../policy/index");
-const userStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Check if the directory exists, if not create it
-    if (!fs.existsSync("uploads/")) {
-      fs.mkdirSync("uploads/");
-    }
-    cb(null, "./uploads");
-  },
+const userStorage = Multer.diskStorage({
+  // destination: (req, file, cb) => {
+  //   cb(null, "./public/images");
+  // },
   filename: (req, file, cb) => {
     cb(
       null,
@@ -20,7 +16,22 @@ const userStorage = multer.diskStorage({
     );
   },
 });
-const upload = multer({ storage: userStorage });
+// const storage = new Multer.memoryStorage();
+
+
+var upload = Multer({ //multer settings
+  storage: userStorage,
+  fileFilter: function (req, file, callback) {
+    var ext = path.extname(file.originalname);
+    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
+      return callback(new Error('Only images are allowed'))
+    }
+    callback(null, true)
+  },
+  limits: {
+    fileSize: 1024 * 1024
+  }
+})
 
 // router
 //   .route("/accontVerification")
