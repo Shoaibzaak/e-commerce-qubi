@@ -349,12 +349,12 @@ module.exports = {
   getAdminById: async (req, res, next) => {
     try {
       const admin = req.user; // Assuming the admin ID is passed as a route parameter
-      const adminId= admin._id
+      const adminId = admin._id;
       if (!adminId) {
         throw new HTTPError(Status.BAD_REQUEST, "Admin ID is required");
       }
 
-      let user = await Model.Admin.findById(adminId);
+      let user = await Model.Admin.findById(adminId).populate("address");
 
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, "Admin not found");
@@ -381,38 +381,56 @@ module.exports = {
   },
   uploadAdminProfilePic: catchAsync(async (req, res, next) => {
     const userData = req.body;
-    console.log("uploadProfilePic has been called");
+    const { address } = req.body;
     try {
-      // Check if profile picture file is present
-      if (
-        !req.files ||
-        !req.files.profilePic ||
-        req.files.profilePic.length === 0
-      ) {
-        console.log("No profile pic is selected");
-        return res.badRequest("No profile pic is selected");
+      if (req.files.profilePic) {
+        const file = req.files.profilePic[0]; // Assuming you only want to handle one profile picture
+        const { path } = file;
+
+        // Upload the file to Cloudinary
+        var cloudinaryResult = await cloudUpload.cloudinaryUpload(path);
       }
+      // Fetch the user
+      const user = await Model.Admin.findById(userData.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      // Handle address update
+      if (address) {
+        const addressData = JSON.parse(address);
+        let savedAddress;
 
-      const file = req.files.profilePic[0]; // Assuming you only want to handle one profile picture
-      const { path } = file;
+        // Check if user already has an address
+        if (user.address) {
+          savedAddress = await Model.Address.findByIdAndUpdate(
+            user.address,
+            addressData,
+            { new: true }
+          );
+        } else {
+          savedAddress = await new Model.Address(addressData).save();
+        }
 
-      // Upload the file to Cloudinary
-      const cloudinaryResult = await cloudUpload.cloudinaryUpload(path);
-      // Update user model with the image URL
+        user.address = savedAddress._id;
+      }
       const result = await Model.Admin.findByIdAndUpdate(
         { _id: userData.userId },
         {
           profilePic: cloudinaryResult,
-        }, // Assuming 'profilePic' is a field in your user model
-        { new: true }
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          phoneNumber: userData.phoneNumber,
+          address: user.address
+        },
+        { new: true, runValidators: true }
       );
-
       if (!result) {
         console.log("User not found");
         throw new HTTPError(Status.NOT_FOUND, "User not found");
       }
 
-      const message = "Profile picture uploaded successfully";
+      const message = "Admin Data updated successfully";
       console.log(message);
       res.ok(message, result);
     } catch (err) {
@@ -518,8 +536,8 @@ module.exports = {
 
     try {
       const user = await Model.User.findById(userId)
-      .select('-password') // Exclude the password field
-      .populate("address");
+        .select("-password") // Exclude the password field
+        .populate("address");
 
       if (!user) {
         return res.badRequest("User Not Found in our records");

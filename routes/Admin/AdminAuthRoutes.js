@@ -63,7 +63,7 @@ router
     Controller.AdminAuthController.getAllCustomersAdmin
   );
 router.route("/uploadAdminProfilePic").post(
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   upload.fields([
     {
       name: "profilePic",

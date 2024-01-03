@@ -21,7 +21,14 @@ const AdminModel = new Schema(
     },
     role: {
       type: String,
-      default:"admin"
+      default: "admin",
+    },
+    phoneNumber: {
+      type: Number,
+    },
+    address: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
     },
     profilePic: {
       type: String,
