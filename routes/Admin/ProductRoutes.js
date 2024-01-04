@@ -17,21 +17,22 @@ const userStorage = multer.diskStorage({
   },
 });
 
-var upload = multer({ //multer settings
+var upload = multer({
+  //multer settings
   storage: userStorage,
   fileFilter: function (req, file, callback) {
     var ext = path.extname(file.originalname);
-    if (ext !== '.png' && ext !== '.jpg' && ext !== '.gif' && ext !== '.jpeg') {
-      return callback(new Error('Only images are allowed'))
+    if (ext !== ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
+      return callback(new Error("Only images are allowed"));
     }
-    callback(null, true)
+    callback(null, true);
   },
   limits: {
-    fileSize: 1024 * 1024
-  }
-})
+    fileSize: 1024 * 1024,
+  },
+});
 
-//post custom Product 
+//post custom Product
 router.route("/createProduct").post(
   upload.fields([
     {
@@ -40,7 +41,8 @@ router.route("/createProduct").post(
     },
   ]),
   Authentication.AdminAuth,
-  Controller.ProductController.createProduct);
+  Controller.ProductController.createProduct
+);
 
 //update Product
 router.route("/updateProduct").post(
@@ -51,40 +53,45 @@ router.route("/updateProduct").post(
     },
   ]),
   Authentication.AdminAuth,
-  Controller.ProductController.updateProduct);
+  Controller.ProductController.updateProduct
+);
 
 //delete Product
-router.route("/deleteProduct/:id").delete(
-  Authentication.AdminAuth,
-  Controller.ProductController.declineProduct);
-
+router
+  .route("/deleteProduct/:id")
+  .delete(
+    Authentication.AdminAuth,
+    Controller.ProductController.declineProduct
+  );
 
 // get Product by id
-router.route("/findProductById/:id").get(
-  Authentication.AdminAuth,
-  Controller.ProductController.getProductAdmin);
+router
+  .route("/findProductById/:id")
+  .get(Authentication.AdminAuth, Controller.ProductController.getProductAdmin);
 
-  // get all  Products with details
-router.route("/getAllProducts").get(
-  Authentication.AdminAuth,
-  Controller.ProductController.getAllProductAdmin);
-    // get all  Products with details
-router.route("/getAllWhishLists").get(
-  Authentication.AdminAuth,
-  Controller.ProductController.getAllWhishList);
-
+// get all  Products with details
+router
+  .route("/getAllProducts")
+  .get(
+    Authentication.AdminAuth,
+    Controller.ProductController.getAllProductAdmin
+  );
+// get all  Products with details
+router
+  .route("/getAllWhishLists")
+  .get(Authentication.AdminAuth, Controller.ProductController.getAllWhishList);
+// get all  Products with details
+router
+  .route("/updateToFeature/:id")
+  .put( Controller.ProductController.updateFeatureProduct);
 //=======================  cutomer app side product api's will be start from this ===================    //
-  router.route("/getAllProductsUser").get(
-    Authentication.UserAuth,
-    Controller.ProductController.getAllProductUser);
-      // get Product by id
+router
+  .route("/getAllProductsUser")
+  .get(Authentication.UserAuth, Controller.ProductController.getAllProductUser);
+// get Product by id
 router.route("/findProductUserById/:id").get(
   // Authentication.UserAuth,
-  Controller.ProductController.getProductUser);
-
-
+  Controller.ProductController.getProductUser
+);
 
 module.exports = router;
-
-
-

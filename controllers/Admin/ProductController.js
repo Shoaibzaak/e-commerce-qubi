@@ -30,6 +30,32 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
+  updateFeatureProduct: catchAsync(async (req, res, next) => {
+    console.log("updateWishlistById is called");
+    try {
+      var ProductId = req.params.id;
+  
+      // Find the product by ID
+      var product = await ProductHelper.findProductById(ProductId);
+  
+      // If product is not found
+      if (!product) {
+        return responseHelper.error(res, null, "ProductId does not exist.");
+      }
+  
+      // Update the wishlist attribute to true
+      product.isWhished = true;
+  
+      // Save the updated product
+      await product.save();
+  
+      var message = "Wishlist updated successfully";
+      return responseHelper.success(res, product, message);
+    } catch (error) {
+      responseHelper.requestfailure(res, error);
+    }
+  }),
+  
   // Retrieve Product user by ProductId
   getProductUser: catchAsync(async (req, res, next) => {
     console.log("findProductById is called");
