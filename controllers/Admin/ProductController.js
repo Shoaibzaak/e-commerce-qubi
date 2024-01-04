@@ -34,28 +34,30 @@ module.exports = {
     console.log("updateWishlistById is called");
     try {
       var ProductId = req.params.id;
-  
+
       // Find the product by ID
       var product = await ProductHelper.findProductById(ProductId);
-  
+
       // If product is not found
       if (!product) {
         return responseHelper.error(res, null, "ProductId does not exist.");
       }
-  
-      // Update the wishlist attribute to true
-      product.isWhished = true;
-  
+
+      // Toggle the value of isWhished
+      product.isWhished = !product.isWhished;
+
       // Save the updated product
       await product.save();
-  
-      var message = "Wishlist updated successfully";
+
+      var message = product.isWhished
+        ? "Added to wishlist successfully"
+        : "Removed from wishlist successfully";
       return responseHelper.success(res, product, message);
     } catch (error) {
       responseHelper.requestfailure(res, error);
     }
   }),
-  
+
   // Retrieve Product user by ProductId
   getProductUser: catchAsync(async (req, res, next) => {
     console.log("findProductById is called");
@@ -125,7 +127,7 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
- // Get all Product users with full details
+  // Get all Product users with full details
   getAllProductAdmin: catchAsync(async (req, res, next) => {
     console.log("Productdetails is called");
     try {
@@ -197,8 +199,8 @@ module.exports = {
         // If the calculated skip value is less than 0, return a bad request response
         return res.badRequest("Invalid combination of pageNumber and limit.");
       }
-      const productsTotal = await Model.Product.find({isWhished:true});
-      const products = await Model.Product.find({isWhished:true})
+      const productsTotal = await Model.Product.find({ isWhished: true });
+      const products = await Model.Product.find({ isWhished: true })
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
@@ -329,4 +331,3 @@ module.exports = {
     }
   }),
 };
-
