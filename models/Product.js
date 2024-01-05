@@ -73,7 +73,6 @@ const productModel = new Schema(
     quantity: {
       type: Number,
       min: 0,
-      default: 0,
     },
     discount: {
       type: Number,
@@ -93,12 +92,10 @@ const productModel = new Schema(
     },
     color: {
       type: String,
-      default:""
     },
     size: {
       type: String,
-      enum: ["Small", "Medium", "Large"],
-      default:"Medium"
+      enum: ["Small", "Medium", "Large"]
     },
     variations: [variationSchema],
     // reviews: [{
