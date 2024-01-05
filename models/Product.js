@@ -93,6 +93,7 @@ const productModel = new Schema(
     },
     color: {
       type: String,
+      default:""
     },
     variations: [variationSchema],
     // reviews: [{
