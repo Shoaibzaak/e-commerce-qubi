@@ -73,6 +73,7 @@ const productModel = new Schema(
     quantity: {
       type: Number,
       min: 0,
+      default: 0,
     },
     discount: {
       type: Number,
@@ -89,6 +90,9 @@ const productModel = new Schema(
     sku: {  // SKU field directly under product for simple products
       type: String,
       // unique: true,
+    },
+    color: {
+      type: String,
     },
     variations: [variationSchema],
     // reviews: [{
