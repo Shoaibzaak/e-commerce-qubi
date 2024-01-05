@@ -95,6 +95,11 @@ const productModel = new Schema(
       type: String,
       default:""
     },
+    size: {
+      type: String,
+      enum: ["Small", "Medium", "Large"],
+      default:"Medium"
+    },
     variations: [variationSchema],
     // reviews: [{
     //   type: mongoose.Schema.Types.ObjectId,
