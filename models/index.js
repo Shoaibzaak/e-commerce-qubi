@@ -7,6 +7,7 @@ module.exports = {
   Brand: require("./Brand"),
   Cart :require("./Cart"),
   Contact :require("./Contact"),
-  Address :require("./Address")
+  Address :require("./Address"),
+  DeletionReason :require("./DeletionReason")
  
 };

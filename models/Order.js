@@ -42,6 +42,11 @@ const orderModel = new Schema(
       enum: ["Pending", "Completed", "Cancel"],
       default: "Pending",
     },
+    deletionReason: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "deleteReason",
+    },
+    
   },
 
   {

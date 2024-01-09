@@ -104,18 +104,52 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
-   // Delete a Order user
-   declineAdminOrder: catchAsync(async (req, res, next) => {
-    var OrderId = req.params.id;
+  // Delete a Order user
+  deleteOrderByAdmin: catchAsync(async (req, res, next) => {
+    const OrderId = req.params.id;
+    let { deletionReason } = req.body; // Get the deletion reason from the request body
+
     try {
-      const OrderUser = await Model.Order.findByIdAndDelete(OrderId);
-      if (!OrderUser) return res.badRequest("Order  Not Found in our records");
-      var message = "Order user deleted successfully";
-      res.ok(message, OrderUser);
+      // 1. Retrieve the order details
+      const orderToDelete = await Model.Order.findById(OrderId);
+
+      if (!orderToDelete) {
+        return res.badRequest("Order Not Found in our records");
+      }
+
+      // 2. If no deletion reason provided, use the existing one (if any)
+      if (!deletionReason && orderToDelete.deletionReason) {
+        deletionReason = orderToDelete.deletionReason;
+      }
+     console.log(OrderId,"OrderId")
+      // 3. Delete the order
+      const deletedOrder = await Model.Order.findByIdAndDelete(OrderId);
+
+      if (!deletedOrder) {
+        return res.badRequest("Order Not Found in our records");
+      }
+
+      // 4. Store the deletion reason and some order details (if provided)
+      if (deletionReason) {
+        const orderDataForDeletion = {
+          orderId: deletedOrder._id,
+          items: deletedOrder.items,
+          user: deletedOrder.user,
+          // Add other fields from the order that you want to store
+        };
+        await Model.DeletionReason.create({
+          deletionReason,
+          orderData: orderDataForDeletion,
+        });
+      }
+
+      const message = deletionReason
+        ? `Order deleted successfully with reason: ${deletionReason}`
+        : "Order deleted successfully.";
+
+      res.ok(message, deletedOrder);
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      next(new HTTPError(Status.INTERNAL_SERVER_ERROR, err));
     }
   }),
-
-
 };

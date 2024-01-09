@@ -38,7 +38,7 @@ var upload = multer({ //multer settings
     //delete Order
 router.route("/deleteOrder/:id").delete(
   Authentication.AdminAuth,
-  Controller.OrderAdminController.declineAdminOrder);
+  Controller.OrderAdminController.deleteOrderByAdmin);
 
   
 
