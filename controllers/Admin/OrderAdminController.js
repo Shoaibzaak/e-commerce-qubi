@@ -117,11 +117,11 @@ module.exports = {
         return res.badRequest("Order Not Found in our records");
       }
 
-      // 2. If no deletion reason provided, use the existing one (if any)
-      if (!deletionReason && orderToDelete.deletionReason) {
-        deletionReason = orderToDelete.deletionReason;
+      // 2. If no deletion reason provided, respond with a message
+      if (!deletionReason) {
+        return res.badRequest("Deletion reason is required to delete the order");
       }
-     console.log(OrderId,"OrderId")
+
       // 3. Delete the order
       const deletedOrder = await Model.Order.findByIdAndDelete(OrderId);
 
@@ -129,27 +129,24 @@ module.exports = {
         return res.badRequest("Order Not Found in our records");
       }
 
-      // 4. Store the deletion reason and some order details (if provided)
-      if (deletionReason) {
-        const orderDataForDeletion = {
-          orderId: deletedOrder._id,
-          items: deletedOrder.items,
-          user: deletedOrder.user,
-          // Add other fields from the order that you want to store
-        };
-        await Model.DeletionReason.create({
-          deletionReason,
-          orderData: orderDataForDeletion,
-        });
-      }
+      // 4. Store the deletion reason and some order details
+      const orderDataForDeletion = {
+        orderId: deletedOrder._id,
+        items: deletedOrder.items,
+        user: deletedOrder.user,
+        // Add other fields from the order that you want to store
+      };
+      await Model.DeletionReason.create({
+        deletionReason,
+        orderData: orderDataForDeletion,
+      });
 
-      const message = deletionReason
-        ? `Order deleted successfully with reason: ${deletionReason}`
-        : "Order deleted successfully.";
-
+      const message = `Order deleted successfully with reason: ${deletionReason}`;
       res.ok(message, deletedOrder);
+
     } catch (err) {
       next(new HTTPError(Status.INTERNAL_SERVER_ERROR, err));
     }
-  }),
+}),
+
 };
