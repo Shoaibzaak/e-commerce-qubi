@@ -46,12 +46,7 @@ router.route("/createProduct").post(
 
 //update Product
 router.route("/updateProduct").post(
-  upload.fields([
-    {
-      name: "images",
-      maxCount: 10,
-    },
-  ]),
+  upload.array('images'),
   Authentication.AdminAuth,
   Controller.ProductController.updateProduct
 );

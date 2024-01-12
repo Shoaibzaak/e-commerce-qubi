@@ -60,6 +60,8 @@ module.exports = {
         if (productType === "variations") {
           const targetVariation = productDetail.variations.find(
             (variation) => variation._id.toString() === variationId.toString()
+          //  variation.color === orderItem.color &&  // Assuming 'color' is passed in the orderItem
+          //  variation.size === orderItem.size      // Assuming 'size' is passed in the orderItem
           );
 
           if (!targetVariation) {
