@@ -34,19 +34,25 @@ var upload = multer({
 
 //post custom Product
 router.route("/createProduct").post(
-  upload.fields([
-    {
-      name: "images",
-      maxCount: 10,
-    },
-  ]),
+  // upload.fields([
+  //   {
+  //     name: "images",
+  //     maxCount: 10,
+  //   },
+  // ]),
+  upload.array('images'),
   Authentication.AdminAuth,
   Controller.ProductController.createProduct
 );
 
 //update Product
 router.route("/updateProduct").post(
-  upload.array('images'),
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 10,
+    },
+  ]),
   Authentication.AdminAuth,
   Controller.ProductController.updateProduct
 );
