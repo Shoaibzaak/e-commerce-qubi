@@ -98,23 +98,23 @@ module.exports = {
       } else {
         return res.status(400).json({ error: "Invalid productType" });
       }
-
       ProductData.images = [];
-      // if (Array.isArray(req.files.images)) {
-      //   for (let i = 0; i < req.files.images.length; i++) {
-      //     ProductData.images.push(
-      //       `public/images/${req.files.images[i].originalname}`
-      //     );
-      //   }
-      // }
-      if (req.files) {
-        for (const file of files) {
-          const { path } = file;
-          const newPath = await cloudUpload.cloudinaryUpload(path);
-          ProductData.images.push(newPath);
-        }
-      }
 
+      if (req.files) {
+        const cloudUploadPromises = files.map(async (file) => {
+          try {
+            const { path } = file;
+            const newPath = await cloudUpload.cloudinaryUpload(path);
+            ProductData.images.push(newPath);
+          } catch (uploadError) {
+            console.error('Error uploading image to Cloudinary:', uploadError);
+            // Handle the error as needed (e.g., log it, send a response, etc.)
+          }
+        });
+  
+        // Wait for all Cloudinary uploads to complete before proceeding
+        await Promise.all(cloudUploadPromises);
+      }
       var result = await ProductHelper.createProduct(ProductData);
 
       var message = "Product created successfully";
