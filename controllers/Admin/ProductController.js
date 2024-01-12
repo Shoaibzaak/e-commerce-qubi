@@ -110,7 +110,6 @@ module.exports = {
       if (req.files) {
         for (const file of files) {
           const { path } = file;
-          console.log(path,"path===>")
           const newPath = await cloudUpload.cloudinaryUpload(path);
           ProductData.images.push(newPath);
         }
