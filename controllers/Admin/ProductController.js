@@ -83,7 +83,7 @@ module.exports = {
     try {
       var ProductData = req.body;
       console.log(ProductData, "ProductData");
-      const files = req.files.images;
+      const files = req.files
       // Validate and set unique SKUs
       if (ProductData.productType === "simple") {
         if (!ProductData.sku) {
@@ -107,9 +107,10 @@ module.exports = {
       //     );
       //   }
       // }
-      if (req.files.images) {
+      if (req.files) {
         for (const file of files) {
           const { path } = file;
+          console.log(path,"path===>")
           const newPath = await cloudUpload.cloudinaryUpload(path);
           ProductData.images.push(newPath);
         }
