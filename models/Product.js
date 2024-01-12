@@ -72,7 +72,7 @@ const productModel = new Schema(
     },
     quantity: {
       type: Number,
-      min: 0,
+      min: 1,
     },
     discount: {
       type: Number,
