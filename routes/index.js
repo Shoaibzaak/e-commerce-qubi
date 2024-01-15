@@ -1,5 +1,4 @@
 module.exports = {
-  FamilyRoutes: require("./FamilyRoutes"),
   AdminAuthRoutes: require("./Admin/AdminAuthRoutes"),
   CategoryRoutes: require("./Admin/CategoryRoutes"),
   ProductRoutes: require("./Admin/ProductRoutes"),
