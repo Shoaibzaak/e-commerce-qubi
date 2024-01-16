@@ -65,7 +65,7 @@ getAllBrandUsers: catchAsync(async (req, res, next) => {
 
     // Check if no brands are found
     if (BrandSize === 0) {
-      return responseHelper.notFound(res, "Branddetails do not exist.");
+      res.notFound("no record found",result?.Brand)
     }
 
     // Return a success response with the result

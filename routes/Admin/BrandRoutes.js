@@ -31,34 +31,29 @@ var upload = multer({ //multer settings
   }
 })
 
-//post custom Family 
+//post custom brand 
 router.route("/createBrand").post(
-//   upload.fields([
-//     {
-//       name: "images",
-//       maxCount: 10,
-//     },
-//   ]),
+
   Authentication.AdminAuth,
   Controller.BrandController.createBrand);
 
-//update Family
+//update brand
 router.route("/updateBrand").post(
   Authentication.AdminAuth,
   Controller.BrandController.updateBrand);
 
-//delete Family
+//delete brand
 router.route("/deleteBrand/:id").delete(
   Authentication.AdminAuth,
   Controller.BrandController.declineBrand);
 
 
-// get Family by id
+// get brand by id
 router.route("/findBrandById/:id").get(
   Authentication.AdminAuth,
   Controller.BrandController.getBrandUser);
 
-  // get all  Familys with details
+  // get all  brands with details
 router.route("/getAllBrands").get(
   Authentication.AdminAuth,
   Controller.BrandController.getAllBrandUsers);
