@@ -23,8 +23,8 @@ module.exports = {
       const isValidate = await validatePassword({ password });
       if (!isValidate) return res.badRequest(Message.passwordTooWeak);
       const hash = encrypt.hashSync(password, 10);
-      const otp = otpService.issue();
-      const otpExpiry = moment().add(10, "minutes").valueOf();
+      // const otp = otpService.issue();
+      // const otpExpiry = moment().add(10, "minutes").valueOf();
       const verifyEmail = await Model.User.findOne({ email });
       if (verifyEmail)
         throw new HTTPError(Status.BAD_REQUEST, Message.emailAlreadyExists);
@@ -33,8 +33,8 @@ module.exports = {
         lastName,
         email,
         password: hash,
-        otp: otp,
-        otpExpiry: otpExpiry,
+        // otp: otp,
+        // otpExpiry: otpExpiry,
       });
 
       // Delete unverified users who has register 24 hours before
@@ -196,6 +196,11 @@ module.exports = {
         // Hash the temporary password
         const salt = await encrypt.genSalt(10);
         const hash = await encrypt.hash(tempPassword, salt);
+        // Update user's OTP and its expiry in the database
+        await Model.User.findOneAndUpdate(
+          { _id: user._id },
+          { $set: { otp, otpExpiry: otpExpiryCode } }
+      );
 
         // Update user's password in the database
         await Model.User.findOneAndUpdate(
