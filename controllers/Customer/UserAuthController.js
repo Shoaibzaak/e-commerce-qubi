@@ -43,9 +43,9 @@ module.exports = {
         createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
       });
       await User.save();
-      let otpCode = {
-        otp,
-      };
+      // let otpCode = {
+      //   otp,
+      // };
       // await Services.EmailService.sendEmail(
       //   "public/otpVerification.html",
       //   otpCode,
