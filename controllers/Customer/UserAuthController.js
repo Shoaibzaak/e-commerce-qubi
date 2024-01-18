@@ -46,12 +46,12 @@ module.exports = {
       let otpCode = {
         otp,
       };
-      await Services.EmailService.sendEmail(
-        "public/otpVerification.html",
-        otpCode,
-        email,
-        "User Account Email Verification "
-      );
+      // await Services.EmailService.sendEmail(
+      //   "public/otpVerification.html",
+      //   otpCode,
+      //   email,
+      //   "User Account Email Verification "
+      // );
       return res.ok(
         "Registration successful. A verification code has been sent to your email.",
         User
