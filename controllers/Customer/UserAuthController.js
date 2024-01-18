@@ -79,7 +79,7 @@ module.exports = {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
       const newFieldValue = "new value";
-      const match = await bcrypt.compare(password, user.password);
+      const match = await encrypt.compare(password, user.password);
 
       if (match) {
         await Model.User.findOneAndUpdate(
