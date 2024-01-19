@@ -49,7 +49,10 @@ const UserModel = new Schema(
     googleId: {
       type: String,
     },
-    accessToken: {
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires :{
       type: String,
     },
     address: {

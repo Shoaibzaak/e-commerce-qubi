@@ -4,6 +4,7 @@ const Message = require("../../Message");
 const Services = require("../../services");
 const otpService = require("../../services/OtpService");
 const Status = require("../../status");
+const crypto = require("crypto");
 const HTTPError = require("../../utils/CustomError");
 const moment = require("moment");
 const catchAsync = require("../../utils/catchAsync");
@@ -33,8 +34,8 @@ module.exports = {
         lastName,
         email,
         password: hash,
-        // otp: otp,
-        // otpExpiry: otpExpiry,
+        otp: otp,
+        otpExpiry: otpExpiry,
       });
 
       // Delete unverified users who has register 24 hours before
@@ -43,15 +44,15 @@ module.exports = {
         createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
       });
       await User.save();
-      // let otpCode = {
-      //   otp,
-      // };
-      // await Services.EmailService.sendEmail(
-      //   "public/otpVerification.html",
-      //   otpCode,
-      //   email,
-      //   "User Account Email Verification "
-      // );
+      let otpCode = {
+        otp,
+      };
+      await Services.EmailService.sendEmail(
+        "public/otpVerification.html",
+        otpCode,
+        email,
+        "User Account Email Verification "
+      );
       return res.ok(
         "Registration successful. A verification code has been sent to your email.",
         User
@@ -173,75 +174,123 @@ module.exports = {
     const { email } = req.body;
 
     if (!email) {
-        return res.badRequest(Message.badRequest);
+      return res.badRequest(Message.badRequest);
     }
 
     try {
-        let user = await Model.User.findOne({ email });
+      let user = await Model.User.findOne({ email });
 
-        if (!user) {
-            throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
-        }
+      if (!user) {
+        throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
+      }
 
-        // Generate OTP and its expiry
-        const otp = otpService.issue();
-        const otpExpiryCode = moment().add(10, "minutes").valueOf();
+      // Generate OTP and its expiry
+      const otp = otpService.issue();
+      const otpExpiryCode = moment().add(10, "minutes").valueOf();
 
-        // Generate a temporary password
-        const tempPassword = referralCodes.generate({
-            length: 8,
-            charset: referralCodes.charset("alphanumeric"),
-        })[0];
+      // Generate a temporary password
+      const tempPassword = referralCodes.generate({
+        length: 8,
+        charset: referralCodes.charset("alphanumeric"),
+      })[0];
 
-        // Hash the temporary password
-        const salt = await encrypt.genSalt(10);
-        const hash = await encrypt.hash(tempPassword, salt);
-        // Update user's OTP and its expiry in the database
-        await Model.User.findOneAndUpdate(
-          { _id: user._id },
-          { $set: { otp, otpExpiry: otpExpiryCode } }
+      // Hash the temporary password
+      const salt = await encrypt.genSalt(10);
+      const hash = await encrypt.hash(tempPassword, salt);
+
+      // Update user's password in the database
+      await Model.User.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { password: hash } }
       );
 
-        // Update user's password in the database
-        await Model.User.findOneAndUpdate(
-            { _id: user._id },
-            { $set: { password: hash } }
-        );
+      // Send email with temporary password
+      const replacements = {
+        tempPassword,
+      };
 
-        // Send email with temporary password
-        const replacements = {
-            tempPassword,
-        };
+      await Services.EmailService.sendEmail(
+        "public/otpResetPass.html",
+        replacements,
+        email,
+        "Forget Password "
+      );
 
-        await Services.EmailService.sendEmail(
-            "public/otpResetPass.html",
-            replacements,
-            email,
-            "Forget Password "
-        );
-
-        return res.ok("Temporary password has been sent to your registered email.");
-
+      return res.ok(
+        "Temporary password has been sent to your registered email."
+      );
     } catch (error) {
-        // Handle errors
-        if (error instanceof HTTPError) {
-            return res.status(error.status).send(error.message);
-        }
-        console.error(error); // Log other unexpected errors for debugging
-        return res.status(Status.INTERNAL_SERVER_ERROR).send(Message.serverError);
+      // Handle errors
+      if (error instanceof HTTPError) {
+        return res.status(error.status).send(error.message);
+      }
+      console.error(error); // Log other unexpected errors for debugging
+      return res.status(Status.INTERNAL_SERVER_ERROR).send(Message.serverError);
     }
-}),
+  }),
+  forgetUserPassword: catchAsync(async (req, res, next) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.badRequest(Message.badRequest);
+    }
+
+    try {
+      let user = await Model.User.findOne({ email });
+
+      if (!user) {
+        throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
+      }
+      // Generate a unique token for password reset
+      const resetToken = crypto.randomBytes(20).toString("hex");
+
+      // Set the reset token and its expiry in the user document
+      user.resetPasswordToken = resetToken;
+       user.resetPasswordExpires = Date.now() + 600000; // Token expires in 10 minutes
+
+      // Save the user document with the reset token
+      await user.save();
+
+      // Send email with the reset link
+      const resetLink = `https://online-shopping-store-mern-main.vercel.app/Forgotemail?token=${resetToken}`;
+
+      // Send email with temporary password
+      const replacements = {
+        resetLink,
+      };
+
+      await Services.EmailService.sendEmail(
+        "public/resetPassword.html",
+        replacements,
+        email,
+        "Forget Password "
+      );
+
+      return res.ok("Reset Link has been sent to your registered email.");
+    } catch (error) {
+      // Handle errors
+      if (error instanceof HTTPError) {
+        return res.status(error.status).send(error.message);
+      }
+      console.error(error); // Log other unexpected errors for debugging
+      return res.status(Status.INTERNAL_SERVER_ERROR).send(Message.serverError);
+    }
+  }),
 
   updatePassword: catchAsync(async (req, res, next) => {
-    const { otp, newPassword } = req.body;
-    if (!otp || !newPassword)
+    const { newPassword } = req.body;
+    const { token } = req.query;
+    console.log(token,"token")
+    if (!newPassword)
       return res.status(400).json({
         success: false,
         message: Message.badRequest,
         data: null,
       });
     let user;
-    user = await Model.User.findOne({ otp });
+    user = await Model.User.findOne({
+      resetPasswordToken: token,
+    });
     //User not found
     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
     if (user) {
@@ -256,28 +305,33 @@ module.exports = {
         message: Message.passwordTooWeak,
         data: null,
       });
-    encrypt.genSalt(10, (error, salt) => {
-      if (error) return console.log(error);
-      encrypt.hash(newPassword, salt, async (error, hash) => {
-        if (user) {
-          await Model.User.findOneAndUpdate(
-            { _id: user._id },
-            { $set: { password: hash }, $unset: { otp: 1, otpExpiry: 1 } }
-          );
-          // const token = `GHA ${Services.JwtService.issue({
-          //   id: Services.HashService.encrypt(user._id),
-          // })}`;
-          user = { ...user._doc, usertype: "User" };
-          return res.ok("Password updated successfully", user);
-        }
-      });
-    });
+    // Hash the new password
+    const salt = await encrypt.genSalt(10);
+    const hash = await encrypt.hash(newPassword, salt);
+
+    // Update the user's password in the database
+    await Model.User.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          password: hash,
+        },
+        $unset: {
+          resetPasswordToken: 1,
+          otp: 1,
+          otpExpiry: 1,
+          resetPasswordExpires:1
+        },
+      }
+    );
+
+    return res.ok("Password has been successfully reset.");
   }),
 
   changePassword: catchAsync(async (req, res, next) => {
     // this user get from authenticated user
     const verifiedUser = req.user;
-    console.log(verifiedUser)
+    console.log(verifiedUser);
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword)
       return res.status(400).json({
@@ -330,7 +384,7 @@ module.exports = {
       const userId = req.user._id;
       const { address, userData } = req.body;
       const profilePicPath = req.file?.path;
-     console.log(userData,"userData")
+      console.log(userData, "userData");
       // Fetch the user
       const user = await Model.User.findById(userId);
       if (!user) {
