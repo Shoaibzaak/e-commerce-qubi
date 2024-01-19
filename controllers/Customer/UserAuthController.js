@@ -252,7 +252,7 @@ module.exports = {
       await user.save();
 
       // Send email with the reset link
-      const resetLink = `https://online-shopping-store-mern-main.vercel.app/Forgotemail?token=${resetToken}`;
+      const resetLink = `http://localhost:3000/Forgotemail?token=${resetToken}`;
 
       // Send email with temporary password
       const replacements = {
