@@ -65,32 +65,38 @@ module.exports = {
   login: async (req, res, next) => {
     try {
       const { email, password } = req.body;
-
+  
       if (!email || !password) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
       }
-
+  
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
       }
-
+  
       let user = await Model.User.findOne({ email });
-
+  
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
+  
+      if (!user.isEmailConfirmed) {
+        return res.badRequest("Email not confirmed. Please confirm your email via otp.");
+      }
+  
       const newFieldValue = "new value";
       const match = await encrypt.compare(password, user.password);
-
+  
       if (match) {
         await Model.User.findOneAndUpdate(
           { _id: user._id },
           { $set: { fieldName: newFieldValue } }
         );
+  
         const token = `GHA ${Services.JwtService.issue({
           id: Services.HashService.encrypt(user._id),
         })}`;
-
+  
         return res.ok("Log in successfully", {
           token,
           user,
@@ -103,6 +109,7 @@ module.exports = {
       next(err);
     }
   },
+  
   accountVerification: catchAsync(async (req, res, next) => {
     const { otp } = req.body;
     if (!otp) throw new HTTPError(Status.BAD_REQUEST, Message.required);
