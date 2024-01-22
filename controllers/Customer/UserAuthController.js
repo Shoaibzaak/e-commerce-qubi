@@ -455,4 +455,23 @@ module.exports = {
       next(error);
     }
   },
+ // Retrieve User by UserId
+getUserById: catchAsync(async (req, res, next) => {
+  console.log("findUserById is called");
+  try {
+    const userId = req.params.id; // assuming the parameter name is 'id'
+    const user = await Model.User.findById(userId);
+
+    var message = "User found successfully";
+    if (!user) {
+      message = "User does not exist.";
+    }
+
+    return res.ok("User get successfully ",user);
+  } catch (error) {
+    console.error("Error in in getting user:", error);
+    next(error);
+  }
+}),
+
 };

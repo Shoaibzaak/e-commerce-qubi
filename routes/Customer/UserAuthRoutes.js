@@ -52,6 +52,10 @@ router
   .route("/userForgetpassword")
   .post(Controller.UserAuthController.forgetUserPassword);
 
+  router
+  .route("/getUserById/:id")
+  .get(Controller.UserAuthController.getUserById);
+
 router
   .route("/profile/setup")
   .put(
