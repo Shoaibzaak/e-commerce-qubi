@@ -65,38 +65,40 @@ module.exports = {
   login: async (req, res, next) => {
     try {
       const { email, password } = req.body;
-  
+
       if (!email || !password) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
       }
-  
+
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
       }
-  
+
       let user = await Model.User.findOne({ email });
-  
+
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
-  
+
       if (!user.isEmailConfirmed) {
-        return res.badRequest("Email not confirmed. Please confirm your email via otp.");
+        return res.badRequest(
+          "Email not confirmed. Please confirm your email via otp."
+        );
       }
-  
+
       const newFieldValue = "new value";
       const match = await encrypt.compare(password, user.password);
-  
+
       if (match) {
         await Model.User.findOneAndUpdate(
           { _id: user._id },
           { $set: { fieldName: newFieldValue } }
         );
-  
+
         const token = `GHA ${Services.JwtService.issue({
           id: Services.HashService.encrypt(user._id),
         })}`;
-  
+
         return res.ok("Log in successfully", {
           token,
           user,
@@ -109,7 +111,7 @@ module.exports = {
       next(err);
     }
   },
-  
+
   accountVerification: catchAsync(async (req, res, next) => {
     const { otp } = req.body;
     if (!otp) throw new HTTPError(Status.BAD_REQUEST, Message.required);
@@ -253,7 +255,7 @@ module.exports = {
 
       // Set the reset token and its expiry in the user document
       user.resetPasswordToken = resetToken;
-       user.resetPasswordExpires = Date.now() + 600000; // Token expires in 10 minutes
+      user.resetPasswordExpires = Date.now() + 600000; // Token expires in 10 minutes
 
       // Save the user document with the reset token
       await user.save();
@@ -287,7 +289,7 @@ module.exports = {
   updatePassword: catchAsync(async (req, res, next) => {
     const { newPassword } = req.body;
     const { token } = req.query;
-    console.log(token,"token")
+    console.log(token, "token");
     if (!newPassword)
       return res.status(400).json({
         success: false,
@@ -327,7 +329,7 @@ module.exports = {
           resetPasswordToken: 1,
           otp: 1,
           otpExpiry: 1,
-          resetPasswordExpires:1
+          resetPasswordExpires: 1,
         },
       }
     );
@@ -455,23 +457,20 @@ module.exports = {
       next(error);
     }
   },
- // Retrieve User by UserId
-getUserById: catchAsync(async (req, res, next) => {
-  console.log("findUserById is called");
-  try {
-    const userId = req.params.id; // assuming the parameter name is 'id'
-    const user = await Model.User.findById(userId).populate("address");
+  // Retrieve User by UserId
+  getUserById: catchAsync(async (req, res, next) => {
+    console.log("findUserById is called");
+    try {
+      const userId = req.params.id; // assuming the parameter name is 'id'
+      const user = await Model.User.findById(userId).populate("address");
+      if (!user) {
+        message = "User does not exist.";
+      }
 
-    var message = "User found successfully";
-    if (!user) {
-      message = "User does not exist.";
+      return res.ok("User get successfully ", user);
+    } catch (error) {
+      console.error("Error in in getting user:", error);
+      next(error);
     }
-
-    return res.ok("User get successfully ",user);
-  } catch (error) {
-    console.error("Error in in getting user:", error);
-    next(error);
-  }
-}),
-
+  }),
 };
