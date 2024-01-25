@@ -54,7 +54,8 @@ router
 
   router
   .route("/getUserById")
-  .get(Controller.UserAuthController.getUserById);
+  .get(Controller.UserAuthController.getUserById),
+   Authentication.UserAuth;
 
 router
   .route("/profile/setup")
