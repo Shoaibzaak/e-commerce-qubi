@@ -52,11 +52,9 @@ router
   .route("/userForgetpassword")
   .post(Controller.UserAuthController.forgetUserPassword);
 
-  router
+router
   .route("/getUserById")
-  .get(Controller.UserAuthController.getUserById),
-   Authentication.UserAuth;
-
+  .get(Authentication.UserAuth, Controller.UserAuthController.getUserById);
 router
   .route("/profile/setup")
   .put(
