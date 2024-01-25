@@ -461,12 +461,11 @@ module.exports = {
   getUserById: catchAsync(async (req, res, next) => {
     console.log("findUserById is called");
     try {
-      const userId = req.params.id; // assuming the parameter name is 'id'
+      const userId=req.user._id
       const user = await Model.User.findById(userId).populate("address");
       if (!user) {
-        message = "User does not exist.";
+        res.noFound("User not found")
       }
-
       return res.ok("User get successfully ", user);
     } catch (error) {
       console.error("Error in in getting user:", error);

@@ -53,7 +53,7 @@ router
   .post(Controller.UserAuthController.forgetUserPassword);
 
   router
-  .route("/getUserById/:id")
+  .route("/getUserById")
   .get(Controller.UserAuthController.getUserById);
 
 router
