@@ -59,6 +59,10 @@ const UserModel = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Address",
     },
+    role:{
+      type: String,
+      default:'User'
+    }
   },
   {
     timestamps: true,
