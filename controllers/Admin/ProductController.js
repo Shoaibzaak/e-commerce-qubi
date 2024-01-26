@@ -83,7 +83,7 @@ module.exports = {
     try {
       var ProductData = req.body;
       console.log(ProductData, "ProductData");
-      const files = req.files
+      const files = req.files;
       // Validate and set unique SKUs
       if (ProductData.productType === "simple") {
         if (!ProductData.sku) {
@@ -107,11 +107,11 @@ module.exports = {
             const newPath = await cloudUpload.cloudinaryUpload(path);
             ProductData.images.push(newPath);
           } catch (uploadError) {
-            console.error('Error uploading image to Cloudinary:', uploadError);
+            console.error("Error uploading image to Cloudinary:", uploadError);
             // Handle the error as needed (e.g., log it, send a response, etc.)
           }
         });
-  
+
         // Wait for all Cloudinary uploads to complete before proceeding
         await Promise.all(cloudUploadPromises);
       }
@@ -236,11 +236,8 @@ module.exports = {
     try {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
       const limit = parseInt(req.query.limit) || 10;
-
       if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-        // If pageNumber or limit is not a valid non-negative number, return a bad request response
         return res.badRequest("Invalid query parameters");
-        // return responseHelper.badRequest(res, "Invalid query parameters.");
       }
 
       const message = "Productdetails found successfully";
@@ -248,8 +245,35 @@ module.exports = {
       const skipValue = pageNumber * limit - limit;
 
       if (skipValue < 0) {
-        // If the calculated skip value is less than 0, return a bad request response
         return res.badRequest("Invalid combination of pageNumber and limit.");
+      }
+
+      const filters = {};
+
+      if (req.query.categoryIds) {
+        filters.type = { $in: req.query.categoryIds.split(",") };
+      }
+      if (req.query.brandIds) {
+        filters.brand = { $in: req.query.brandIds.split(",") };
+      }
+      if (req.query.colors) {
+        filters.color = { $in: req.query.colors.split(",") };
+      }
+      if (req.query.discount) filters.discount = req.query.discount;
+      if (req.query.priceMin)
+        filters.price = { $gte: parseInt(req.query.priceMin) };
+      if (req.query.priceMax) {
+        if (!filters.price) filters.price = {};
+        filters.price.$lte = parseInt(req.query.priceMax);
+      }
+
+      if (Object.keys(filters).length > 0) {
+        var filterProducts = await Model.Product.find(filters)
+          .skip(skipValue)
+          .limit(limit)
+          .sort("_id")
+          .populate("type")
+          .populate("brand");
       }
       const productsTotal = await Model.Product.find();
       const products = await Model.Product.find()
@@ -258,27 +282,23 @@ module.exports = {
         .sort("_id")
         .populate("type")
         .populate("brand");
-
       const ProductSize = productsTotal.length;
 
       const result = {
-        Product: products,
+        Product: Object.keys(filters).length > 0 ? filterProducts : products,
         totalProducts: ProductSize,
         limit: limit,
       };
 
       if (ProductSize === 0) {
-        // If no products are found, return a not found response
         return responseHelper.requestfailure(
           res,
           "Productdetails do not exist."
         );
       }
 
-      // Return a success response with status code 200
       return responseHelper.success(res, result, message);
     } catch (error) {
-      // Return a failure response with status code 500
       responseHelper.requestfailure(res, error);
     }
   }),
