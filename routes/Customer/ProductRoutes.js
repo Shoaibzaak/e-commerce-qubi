@@ -45,46 +45,15 @@ router.route("/createProduct").post(
   Controller.ProductController.createProduct
 );
 
-//update Product
-router.route("/updateProduct").post(
-  upload.fields([
-    {
-      name: "images",
-      maxCount: 10,
-    },
-  ]),
-  Authentication.AdminAuth,
-  Controller.ProductController.updateProduct
-);
-
-//delete Product
+//=======================  cutomer app side product api's will be start from this ===================    //
 router
-  .route("/deleteProduct/:id")
-  .delete(
-    Authentication.AdminAuth,
-    Controller.ProductController.declineProduct
-  );
-
+  .route("/getAllProductsUser")
+  .get(Authentication.UserAuth,
+    Controller.ProductController.getAllProductUser);
 // get Product by id
-router
-  .route("/findProductById/:id")
-  .get(Authentication.AdminAuth, Controller.ProductController.getProductAdmin);
-
-// get all  Products with details
-router
-  .route("/getAllProducts")
-  .get(
-    Authentication.AdminAuth,
-    Controller.ProductController.getAllProductAdmin
-  );
-// get all  Products with details
-router
-  .route("/getAllWhishLists")
-  .get(Authentication.AdminAuth, Controller.ProductController.getAllWhishList);
-// get all  Products with details
-router
-  .route("/updateToFeature/:id")
-  .put( Controller.ProductController.updateFeatureProduct);
-
+router.route("/findProductUserById/:id").get(
+  // Authentication.UserAuth,
+  Controller.ProductController.getProductUser
+);
 
 module.exports = router;

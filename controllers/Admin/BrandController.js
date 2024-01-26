@@ -5,8 +5,6 @@ const responseHelper = require("../../helper/response.helper");
 const BrandHelper = require("../../helper/brand.helper");
 const Status = require("../../status");
 const catchAsync = require("../../utils/catchAsync");
-const pushRepository = require("../pushController");
-const pushRepo = new pushRepository();
 
 
 module.exports = {

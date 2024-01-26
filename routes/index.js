@@ -10,4 +10,5 @@ module.exports = {
 
 UserAuthRoutes: require("./Customer/UserAuthRoutes"),
 OrderRoutes: require("./Customer/OrderRoutes"),
+ProductRoutes: require("./Customer/ProductRoutes"),
 };
