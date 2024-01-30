@@ -10,5 +10,6 @@ module.exports = {
   //** matt controllers   ** //
 
   UserAuthController: require("./Customer/UserAuthController"),
-  OrderController: require("./Customer/OrderController")
+  OrderController: require("./Customer/OrderController"),
+  ContactController: require("./Customer/ContactController")
 };

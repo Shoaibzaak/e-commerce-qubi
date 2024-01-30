@@ -1,4 +1,6 @@
 module.exports = {
+    /*  Admin routes */
+
   AdminAuthRoutes: require("./Admin/AdminAuthRoutes"),
   CategoryRoutes: require("./Admin/CategoryRoutes"),
   ProductRoutes: require("./Admin/ProductRoutes"),
@@ -11,4 +13,5 @@ module.exports = {
 UserAuthRoutes: require("./Customer/UserAuthRoutes"),
 OrderRoutes: require("./Customer/OrderRoutes"),
 ProductRoutes: require("./Customer/ProductRoutes"),
+ContactRoutes: require("./Customer/ContactRoutes"),
 };
