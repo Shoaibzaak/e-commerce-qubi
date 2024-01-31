@@ -2,7 +2,7 @@
 
 const { register } = require("../../controllers/Customer/UserAuthController");
 const Model = require("../../models/index");
-const { validation } = require("../../validations/validation");
+const { validation } = require("../validations/validation");
 const validatePassword = require("../validatePassword");
 const catchAsync=require("../catchAsync")
 // Mock dependencies if needed
