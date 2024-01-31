@@ -1,7 +1,7 @@
-const Model = require("../models/index");
-const HTTPError = require("../utils/CustomError");
-const Status = require("../status");
-const Message = require("../Message");
+const Model = require("../../models/index");
+const HTTPError = require("../CustomError");
+const Status = require("../../status");
+const Message = require("../../Message");
 
 module.exports = {
 

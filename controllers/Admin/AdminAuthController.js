@@ -1,5 +1,5 @@
 const Model = require("../../models/index");
-const Validation = require("../../validations/validation");
+const Validation = require("../../utils/validations/validation");
 const Message = require("../../Message");
 const Services = require("../../services");
 const otpService = require("../../services/OtpService");
