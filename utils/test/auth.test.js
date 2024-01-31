@@ -4,12 +4,36 @@ const { register } = require("../../controllers/Customer/UserAuthController");
 const Model = require("../../models/index");
 const { validation } = require("../../validations/validation");
 const validatePassword = require("../validatePassword");
+const catchAsync=require("../catchAsync")
 // Mock dependencies if needed
 
 // Mock dependencies if needed
 // Import or mock Validation, validatePassword, encrypt, otpService, Model, Services.EmailService, etc.
 
 describe("Register Function", () => {
+// Create a test case
+// Mock an asynchronous function that throws an error
+test('catchAsync handles errors correctly', async () => {
+  const asyncFunction = async () => {
+    throw new Error('Test error');
+  };
+  
+  // Mock Express request, response, and next functions
+  const req = {};
+  const res = {};
+  const next = jest.fn(); // Define the next function using jest.fn()
+  
+  // Wrap the async function with catchAsync
+  const wrappedAsyncFunction = catchAsync(asyncFunction);
+
+  // Call the wrapped async function with mocked req, res, and next
+  await wrappedAsyncFunction(req, res, next);
+
+  // Expect the next function to be called with the error
+  expect(next).toHaveBeenCalledWith(expect.any(Error));
+});
+
+
   test("handles invalid email format", async () => {
     // Implement a test for the case where email validation fails
     // You can mock the Validation module to return false for validateEmail
