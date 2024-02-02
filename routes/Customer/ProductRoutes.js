@@ -40,7 +40,7 @@ router.route("/createProduct").post(
   //     maxCount: 10,
   //   },
   // ]),
-  upload.array('images'),
+  upload.array("images"),
   Authentication.AdminAuth,
   Controller.ProductController.createProduct
 );
@@ -48,13 +48,16 @@ router.route("/createProduct").post(
 //=======================  cutomer app side product api's will be start from this ===================    //
 router
   .route("/getAllProductsUser")
-  .get(
-    // Authentication.UserAuth,
-    Controller.ProductController.getAllProductUser);
+  .get(Controller.ProductController.getAllProductUser);
 // get Product by id
-router.route("/findProductUserById/:id").get(
-  // Authentication.UserAuth,
-  Controller.ProductController.getProductUser
-);
+router
+  .route("/findProductUserById/:id")
+  .get(Controller.ProductController.getProductUser);
+router
+  .route("/getAllUserBrands")
+  .get(Controller.ProductController.getAllUserBrands);
+  router
+  .route("/getAllUserCategorys")
+  .get(Controller.ProductController.getAllUserCategorys);
 
 module.exports = router;
