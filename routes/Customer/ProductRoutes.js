@@ -32,18 +32,6 @@ var upload = multer({
   },
 });
 
-//post custom Product
-router.route("/createProduct").post(
-  // upload.fields([
-  //   {
-  //     name: "images",
-  //     maxCount: 10,
-  //   },
-  // ]),
-  upload.array("images"),
-  Authentication.AdminAuth,
-  Controller.ProductController.createProduct
-);
 
 //=======================  cutomer app side product api's will be start from this ===================    //
 router
