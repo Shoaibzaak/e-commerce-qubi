@@ -11,6 +11,6 @@ router.use("/order", Routes.OrderAdminRoutes);
 /*   Matt routes  */
 router.use("/auth/user", Routes.UserAuthRoutes);
 router.use("/user/order", Routes.OrderRoutes);
-router.use("/user/product", Routes.ProductRoutes);
+router.use("/user/product", Routes.ProductUserRoutes);
 router.use("/user/contact", Routes.ContactRoutes);
 module.exports = router;

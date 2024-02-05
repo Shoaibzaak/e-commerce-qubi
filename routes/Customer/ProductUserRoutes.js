@@ -36,21 +36,16 @@ var upload = multer({
 //=======================  cutomer app side product api's will be start from this ===================    //
 router
   .route("/getAllProductsUser")
-  .get(Controller.ProductController.getAllProductUser);
-  router
-  .route("/getAllProducts")
-  .get(
-    Authentication.AdminAuth,
-    Controller.ProductController.getAllProductAdmin
-  );
+  .get(Controller.ProductUserController.getAllProductUser);
+  
 router
   .route("/findProductUserById/:id")
-  .get(Controller.ProductController.getProductUser);
+  .get(Controller.ProductUserController.getProductUser);
 router
   .route("/getAllUserBrands")
-  .get(Controller.ProductController.getAllUserBrands);
+  .get(Controller.ProductUserController.getAllUserBrands);
   router
   .route("/getAllUserCategorys")
-  .get(Controller.ProductController.getAllUserCategorys);
+  .get(Controller.ProductUserController.getAllUserCategorys);
 
 module.exports = router;
