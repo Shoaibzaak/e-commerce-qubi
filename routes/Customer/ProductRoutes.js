@@ -49,7 +49,12 @@ router.route("/createProduct").post(
 router
   .route("/getAllProductsUser")
   .get(Controller.ProductController.getAllProductUser);
-// get Product by id
+  router
+  .route("/getAllProducts")
+  .get(
+    Authentication.AdminAuth,
+    Controller.ProductController.getAllProductAdmin
+  );
 router
   .route("/findProductUserById/:id")
   .get(Controller.ProductController.getProductUser);
