@@ -31,25 +31,31 @@ module.exports = {
   createCategory: catchAsync(async (req, res, next) => {
     console.log("createCategory is called");
     try {
-      var CategoryData = req.body;
-      //   CategoryData.images = [];
-      //   if (Array.isArray(req.files.images)) {
-      //     for (let i = 0; i < req.files.images.length; i++) {
-      //       CategoryData.images.push(
-      //         `public/images/${req.files.images[i].originalname}`
-      //       );
-      //     }
-      //   }
-      var result = await CategoryHelper.createCategory(CategoryData);
+      const { categoryName, childCategories, parentId } = req.body;
 
-      var message = "Category created successfully";
-      if (result == null) {
-        message = "Category does not exist.";
+      let parentCategory = null;
+
+      if (parentId) {
+        parentCategory = await Model.Category.findById(parentId);
+
+        if (!parentCategory) {
+          return res.status(404).json({ message: "Parent category not found" });
+        }
       }
 
-      return responseHelper.success(res, CategoryData, message);
+      const newCategory = new Model.Category({
+        categoryName,
+        parentCategory: parentId || null,
+      });
+      // If childCategories are provided, add them to the new category's childCategories array
+      if (childCategories && Array.isArray(childCategories)) {
+        newCategory.childCategories = childCategories;
+      }
+      const savedCategory = await newCategory.save();
+      res.json(savedCategory);
     } catch (error) {
-      responseHelper.requestfailure(res, error);
+      console.error(error);
+      res.status(500).send(error?.message, "Server Error");
     }
   }),
 
@@ -79,13 +85,18 @@ module.exports = {
   getAllCategoryUsers: catchAsync(async (req, res, next) => {
     console.log("Categorydetails is called");
     try {
-      // Fetch all categories without pagination
-      const categorys = await Model.Category.find({isDeleted:false}).sort("-_id");
+      // Fetch all categories without pagination and populate parentCategory
+      const categories = await Model.Category.find({ isDeleted: false })
+        .sort("-_id")
+        .populate({
+          path: "parentCategory",
+          select: "_id categoryName",
+        });
 
-      const CategorySize = categorys.length;
+      const CategorySize = categories.length;
 
       const result = {
-        Category: categorys,
+        Category: categories,
         count: CategorySize,
       };
 
@@ -144,21 +155,21 @@ module.exports = {
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
     try {
-        // Find the category by ID and update it to set isDeleted to true
-        const updatedCategory = await Model.Category.findByIdAndUpdate(
-            CategoryId,
-            { isDeleted: true },
-            { new: true } // To return the updated document
-        );
+      // Find the category by ID and update it to set isDeleted to true
+      const updatedCategory = await Model.Category.findByIdAndUpdate(
+        CategoryId,
+        { isDeleted: true },
+        { new: true } // To return the updated document
+      );
 
-        // If category is not found, return a bad request response
-        if (!updatedCategory)
-            return res.badRequest("Category not found in our records");
+      // If category is not found, return a bad request response
+      if (!updatedCategory)
+        return res.badRequest("Category not found in our records");
 
-        var message = "Category deleted successfully";
-        res.ok(message, updatedCategory);
+      var message = "Category deleted successfully";
+      res.ok(message, updatedCategory);
     } catch (err) {
-        throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
 

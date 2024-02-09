@@ -60,7 +60,7 @@ router.route("/findCategoryById/:id").get(
 
   // get all  Familys with details
 router.route("/getAllCategories").get(
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   Controller.CategoryController.getAllCategoryUsers);
 
 

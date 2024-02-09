@@ -7,10 +7,25 @@ const categoryModel = new Schema(
       type: String,
       required: true,
     },
+    parentCategory: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category', // Reference to the Category model
+      default: null,   // No parent category by default (top-level category)
+    },
+    childCategories: [{
+      categoryName: {
+        type: String,
+      },
+    }],
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
     },
+   
   },
 
   {
@@ -26,5 +41,5 @@ categoryModel.set("toJSON", {
   },
 });
 
-const category = mongoose.model("category", categoryModel);
+const category = mongoose.model("Category", categoryModel);
 module.exports = category;

@@ -152,7 +152,7 @@ module.exports = {
       const products = await Model.Product.find()
         .skip(skipValue)
         .limit(limit)
-        .sort("_id")
+        .sort("-_id")
         .populate("type")
         .populate("brand");
 
