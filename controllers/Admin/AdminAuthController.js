@@ -226,7 +226,7 @@ module.exports = {
   }),
   registerAdmin: async (req, res, next) => {
     try {
-      const { firstName, lastName, email, password } = req.body;
+      const { firstName, lastName, email, password,role } = req.body;
       // Email validation
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
@@ -244,6 +244,7 @@ module.exports = {
         firstName,
         lastName,
         email,
+        role,
         password: hash,
       });
 
@@ -304,9 +305,8 @@ module.exports = {
   // },
   loginAdmin: async (req, res, next) => {
     try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
+      const { email, password ,role} = req.body;
+      if (!email || !password || !role) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
       }
 
@@ -314,7 +314,7 @@ module.exports = {
         return res.badRequest("Invalid email format");
       }
 
-      let user = await Model.Admin.findOne({ email });
+      let user = await Model.Admin.findOne({ email,role });
 
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);

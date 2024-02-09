@@ -24,7 +24,8 @@ const AdminModel = new Schema(
     },
     role: {
       type: String,
-      default: "admin",
+      required: true,
+      enum: ["admin", "vendor"], // Valid values for the role field
     },
     phoneNumber: {
       type: Number,
