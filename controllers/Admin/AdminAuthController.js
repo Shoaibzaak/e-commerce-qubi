@@ -12,14 +12,14 @@ const bcrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
 const cloudUpload = require("../../cloudinary");
 module.exports = {
-  accountVerification: catchAsync(async (req, res, next) => {
+  accountVerificationAdmin: catchAsync(async (req, res, next) => {
     const { otp } = req.body;
     if (!otp) throw new HTTPError(Status.BAD_REQUEST, Message.required);
 
     const now = moment().valueOf();
     let user;
     if (otp) {
-      user = await Model.User.findOne({ otp: otp });
+      user = await Model.Admin.findOne({ otp: otp });
     } else {
       throw new HTTPError(Status.BAD_REQUEST, "otp is required");
     }
@@ -34,7 +34,7 @@ module.exports = {
 
     let userData = {};
     if (otp) {
-      await Model.User.findOneAndUpdate(
+      await Model.Admin.findOneAndUpdate(
         { otp: otp },
         { $set: { isEmailConfirmed: true }, $unset: { otp: 1, otpExpiry: 1 } }
       );
@@ -42,7 +42,8 @@ module.exports = {
 
     userData = {
       _id: user._id,
-      fullname: user.fullName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       ...userData,
     };
@@ -226,17 +227,26 @@ module.exports = {
   }),
   registerAdmin: async (req, res, next) => {
     try {
-      const { firstName, lastName, email, password,role } = req.body;
+      const { firstName, lastName, email, password } = req.body;
       // Email validation
       if (!Validation.validateEmail(email)) {
         return res.badRequest("Invalid email format");
       }
+      let role = "vendor"; // Set a default role if the condition is not met
 
+      if (
+        firstName == "admin" ||
+        firstName == "Admin" ||
+        lastName == "admin" ||
+        lastName == "Admin"
+      ) {
+        role = "admin";
+      }
       const isValidate = await validatePassword({ password });
       if (!isValidate) return res.badRequest(Message.passwordTooWeak);
       const hash = bcrypt.hashSync(password, 10);
-      // const otp = otpService.issue();
-      // const otpExpiry = moment().add(10, "minutes").valueOf();
+      const otp = otpService.issue();
+      const otpExpiry = moment().add(10, "minutes").valueOf();
       const verifyEmail = await Model.Admin.findOne({ email });
       if (verifyEmail)
         throw new HTTPError(Status.BAD_REQUEST, Message.emailAlreadyExists);
@@ -245,12 +255,27 @@ module.exports = {
         lastName,
         email,
         role,
+        otp: otp,
+        otpExpiry: otpExpiry,
         password: hash,
       });
 
       // Delete unverified users who has register 24 hours before
-      // await Model.Admin.deleteMany({isEmailConfirmed: false, createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) } });
+      //  await Model.Admin.deleteMany({
+      //   isEmailConfirmed: false,
+      //   createdAt: { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      // });
       await User.save();
+      // Construct the email message with the OTP
+      const emailMessage = `Thank you for registering with Vagabond.\n\nYour verification code is: ${otp}`;
+
+      // Send the email with the message directly
+      await Services.EmailService.sendEmail(
+        emailMessage,
+        otp,
+        email,
+        "User Account Email Verification | vagabond"
+      );
       // let otpCode = {
       //   otp,
       // };
@@ -305,8 +330,8 @@ module.exports = {
   // },
   loginAdmin: async (req, res, next) => {
     try {
-      const { email, password ,role} = req.body;
-      if (!email || !password || !role) {
+      const { email, password } = req.body;
+      if (!email || !password) {
         throw new HTTPError(Status.BAD_REQUEST, Message.required);
       }
 
@@ -314,7 +339,7 @@ module.exports = {
         return res.badRequest("Invalid email format");
       }
 
-      let user = await Model.Admin.findOne({ email,role });
+      let user = await Model.Admin.findOne({ email });
 
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
@@ -332,6 +357,7 @@ module.exports = {
         // });
         const token = `GHA ${Services.JwtService.issue({
           id: Services.HashService.encrypt(user._id),
+          role: Services.HashService.encrypt(user.role)
         })}`;
 
         return res.ok("Log in successfully", {
@@ -438,7 +464,7 @@ module.exports = {
       const message = "Admin Data updated successfully";
       console.log(message);
       res.ok(message, result);
-    }catch (error) {
+    } catch (error) {
       return res.status(500).json({
         success: false,
         message: error.message,

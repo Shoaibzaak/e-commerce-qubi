@@ -34,6 +34,16 @@ const AdminModel = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Address",
     },
+    otp: {
+      type: Number,
+    },
+    otpExpiry: {
+      type: Number,
+    },
+    isEmailConfirmed: {
+      type: Boolean,
+      default: false,
+    },
     profilePic: {
       type: String,
     },

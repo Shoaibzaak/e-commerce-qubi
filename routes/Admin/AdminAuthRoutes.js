@@ -33,33 +33,9 @@ var upload = Multer({ //multer settings
   }
 })
 
-// router
-//   .route("/accontVerification")
-//   .post(Controller.AdminAuthController.accountVerification);
-// router
-//   .route("/forgetpassword")
-//   .post(Controller.AdminAuthController.forgetPassword);
-// router
-//   .route("/changepassword")
-//   .post(Authentication.UserAuth, Controller.AdminAuthController.changePassword);
-// router.route("/resendOtp").post(Controller.AdminAuthController.resendOtp);
-// router
-//   .route("/updatePassword")
-//   .post(Controller.AdminAuthController.updatePassword);
-
-// router.route("/profile/setup").post(
-//   upload.fields([
-//     {
-//       name: "profilePic",
-//       maxCount: 1,
-//     },
-//     {
-//       name: "resume",
-//       maxCount: 1,
-//     },
-//   ]),
-//   Controller.AuthController.setupProfile
-// );
+router
+  .route("/accontVerificationAdmin")
+  .post(Controller.AdminAuthController.accountVerificationAdmin);
 router
   .route("/registerAdmin")
   .post(Controller.AdminAuthController.registerAdmin);
