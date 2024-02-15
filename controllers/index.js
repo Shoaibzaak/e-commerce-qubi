@@ -4,7 +4,7 @@ module.exports = {
   CategoryController: require("./Admin/CategoryController"),
   BrandController: require("./Admin/BrandController"),
   OrderAdminController: require("./Admin/OrderAdminController"),
-
+  VendorController: require("./Admin/VendorController"),
 
 
   //** matt controllers   ** //

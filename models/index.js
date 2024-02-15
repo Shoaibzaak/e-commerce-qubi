@@ -8,6 +8,7 @@ module.exports = {
   Cart :require("./Cart"),
   Contact :require("./Contact"),
   Address :require("./Address"),
-  DeletionReason :require("./DeletionReason")
+  DeletionReason :require("./DeletionReason"),
+  Vendor :require("./Vendor")
  
 };
