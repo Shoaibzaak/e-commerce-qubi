@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
       if (error) return res.forbidden("Access Denied");
 
       const userId = Services.HashService.decrypt(user.id);
-      const userRole = user.role; // Assuming the role is included in the token payload
+      const userRole = Services.HashService.decrypt(user.role); // Assuming the role is included in the token payload
 
       // Check if the user has the required role (admin or vendor)
       if (userRole !== "admin" && userRole !== "vendor") {
