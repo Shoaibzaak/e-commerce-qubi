@@ -44,6 +44,10 @@ const AdminModel = new Schema(
       type: Boolean,
       default: false,
     },
+    isVendorBlock: {
+      type: Boolean,
+      default: false,
+    },
     profilePic: {
       type: String,
     },
