@@ -6,7 +6,6 @@ const responseHelper = require("../../helper/response.helper");
 const Status = require("../../status");
 const catchAsync = require("../../utils/catchAsync");
 const bcrypt = require("bcrypt");
-const validatePassword = require("../../utils/validatePassword");
 const Validation = require("../../utils/validations/validation");
 
 
