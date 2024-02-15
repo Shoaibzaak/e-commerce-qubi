@@ -23,27 +23,34 @@ module.exports = (req, res, next) => {
       }
 
       const query = { _id: userId };
+      console.log(query,"query")
       Model.Admin.findOne(query)
-        .then((foundUser) => {
-          if (!foundUser) return res.forbidden("Unauthorized request");
+      .then((foundUser) => {
+        if (!foundUser) return res.forbidden("Unauthorized request");
+        
+        req.user = foundUser;
+       // Assuming you have a 'role' property in your user object
+        const userRole = foundUser.role;
+        console.log(userRole,"userRole in after the foundUser===>")
+    
+        // Check if the user is a vendor or admin based on the role
+        if (userRole === "vendor") {
+          req.isVendor = true;
+          req.isAdmin = false;
+        } else {
+          req.isVendor = false;
+          req.isAdmin = true;
+        }
+        console.log(req.isVendor,"vendor")
+        console.log(req.isAdmin,"admin")
 
-          req.user = foundUser;
-
-          // Check if the user is a vendor or admin based on the role
-          if (userRole === "vendor") {
-            req.isVendor = true;
-            req.isAdmin = false;
-          } else {
-            req.isVendor = false;
-            req.isAdmin = true;
-          }
-
-          next();
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(404).json({ status: false, message: "User not found" });
-        });
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(404).json({ status: false, message: "User not found" });
+      });
+    
     });
   } else {
     return res.status(401).send({ code: "FAILED", message: "Token Missing" });

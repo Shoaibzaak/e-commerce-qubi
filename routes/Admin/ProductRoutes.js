@@ -4,7 +4,8 @@ const router = express.Router();
 const path = require("path");
 const multer = require("multer");
 const Authentication = require("../../policy/index");
-
+const authenticatedAdmin=require("../../policy/index")
+const isVendor=require("../../policy/index")
 const userStorage = multer.diskStorage({
   // destination: (req, file, cb) => {
   //   cb(null, "/tmp");
@@ -75,6 +76,7 @@ router
   .route("/getAllProducts")
   .get(
     Authentication.AdminAuth,
+    authenticatedAdmin.isVendor,
     Controller.ProductController.getAllProductAdmin
   );
 // get all  Products with details
