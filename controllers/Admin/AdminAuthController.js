@@ -267,7 +267,7 @@ module.exports = {
       // });
       await User.save();
       // Construct the email message with the OTP
-      const emailMessage = `Thank you for registering with Vagabond.\n\nYour verification code is: ${otp}`;
+      const emailMessage = `Thank you for registering with MATT.\n\nYour verification code is: ${otp}`;
 
       // Send the email with the message directly
       await Services.EmailService.sendEmail(

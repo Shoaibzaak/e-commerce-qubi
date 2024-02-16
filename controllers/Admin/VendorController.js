@@ -89,7 +89,7 @@ getAllVendorUsers: catchAsync(async (req, res, next) => {
 }),
 
 
-  updateVendor: catchAsync(async (req, res, next) => {
+updateVendor: catchAsync(async (req, res, next) => {
     try {
 
        // Get the Vendor user data from the request body
