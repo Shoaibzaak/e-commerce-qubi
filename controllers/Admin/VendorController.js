@@ -7,7 +7,7 @@ const Status = require("../../status");
 const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
 const Validation = require("../../utils/validations/validation");
-const Services=require("../../services")
+const Services = require("../../services");
 
 module.exports = {
   // Retrieve Vendor user by VendorId
@@ -52,7 +52,7 @@ module.exports = {
         password: tempPassword,
       });
 
-      // await vendor.save();
+      await vendor.save();
       const emailMessage = `
 Dear ${firstName} ${lastName},
 
