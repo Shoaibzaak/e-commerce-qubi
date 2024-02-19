@@ -102,7 +102,7 @@ module.exports = {
 
       // Check if no categories are found
       if (CategorySize === 0) {
-        return responseHelper.notFound(res, "Categorydetails do not exist.");
+        return res.badRequest(res, "Categorydetails do not exist.");
       }
 
       // Return a success response with the result
