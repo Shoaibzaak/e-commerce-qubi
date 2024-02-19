@@ -96,11 +96,6 @@ The MATT Team
         count: vendorSize,
       };
 
-      // Check if no Vendors are found
-      if (vendorSize === 0) {
-        res.notFound("no record found", result.Vendor);
-      }
-
       // Return a success response with the result
       return responseHelper.success(
         res,
