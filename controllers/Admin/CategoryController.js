@@ -101,9 +101,7 @@ module.exports = {
       };
 
       // Check if no categories are found
-      if (CategorySize === 0) {
-        return res.badRequest(res, "Categorydetails do not exist.");
-      }
+    
 
       // Return a success response with the result
       return responseHelper.success(
