@@ -234,14 +234,6 @@ module.exports = {
       }
       let role = "vendor"; // Set a default role if the condition is not met
 
-      if (
-        firstName == "admin" ||
-        firstName == "Admin" ||
-        lastName == "admin" ||
-        lastName == "Admin"
-      ) {
-        role = "admin";
-      }
       const isValidate = await validatePassword({ password });
       if (!isValidate) return res.badRequest(Message.passwordTooWeak);
       const hash = bcrypt.hashSync(password, 10);
