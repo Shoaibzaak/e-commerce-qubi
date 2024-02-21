@@ -169,10 +169,10 @@ module.exports = {
           password: hash,
         },
         $unset: {
-          resetPasswordToken: 1,
+          // resetPasswordToken: 1,
           otp: 1,
           otpExpiry: 1,
-          resetPasswordExpires: 1,
+          // resetPasswordExpires: 1,
         },
       }
     );
