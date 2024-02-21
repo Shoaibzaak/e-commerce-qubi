@@ -51,7 +51,7 @@ module.exports = {
     return res.ok("Account verified successfully", userData);
   }),
   //resend otp to email
-  resendOtp: catchAsync(async (req, res, next) => {
+  resendAdminOtp: catchAsync(async (req, res, next) => {
     const { email } = req.body;
     if (!email) throw new HTTPError(Status.BAD_REQUEST, Message.required);
     if (!Validation.validateEmail(email)) {
@@ -60,25 +60,24 @@ module.exports = {
     const otp = otpService.issue();
     const otpExpiryCode = moment().add(10, "minutes").valueOf();
     if (email) {
-      await Model.User.findOneAndUpdate(
+      await Model.Admin.findOneAndUpdate(
         { email: email },
         { $set: { otp: otp, otpExpiry: otpExpiryCode } }
       );
     }
-    let otpCode = {
-      otp,
-    };
     // const token =  Services.JwtService.issue({
     //   id: Services.HashService.encrypt(user._id),
     // })
     // console.log(token)
+     // Construct the email message with the OTP
+     const emailMessage = `Thank you for registering with WE DON'T KNOW WHAT WE HAVE.\n\nYour verification code is: ${otp}`;
     await Services.EmailService.sendEmail(
-      "public/otpVerification.html",
-      otpCode,
+      emailMessage,
+      otp,
       email,
-      "Reset Password | In VAGABOND"
+      "Reset otp "
     );
-    return res.ok("Reset password otp has been sent to your registered email.");
+    return res.ok("Reset otp has been sent to your registered email.");
   }),
 
   forgetAdminPassword: catchAsync(async (req, res, next) => {
@@ -132,7 +131,6 @@ module.exports = {
   updateAdminPassword: catchAsync(async (req, res, next) => {
     const { newPassword } = req.body;
     const { token } = req.query;
-    console.log(token, "token");
     if (!newPassword)
       return res.status(400).json({
         success: false,
@@ -142,6 +140,7 @@ module.exports = {
     let user;
     user = await Model.Admin.findOne({
       resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }, // Check if the token is not expired
     });
     //User not found
     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
