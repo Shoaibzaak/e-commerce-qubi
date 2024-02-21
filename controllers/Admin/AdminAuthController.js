@@ -8,6 +8,7 @@ const HTTPError = require("../../utils/CustomError");
 const moment = require("moment");
 const catchAsync = require("../../utils/catchAsync");
 const referralCodes = require("referral-codes");
+const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const validatePassword = require("../../utils/validatePassword");
 const cloudUpload = require("../../cloudinary");
@@ -80,69 +81,68 @@ module.exports = {
     return res.ok("Reset password otp has been sent to your registered email.");
   }),
 
-  forgetPassword: catchAsync(async (req, res, next) => {
+  forgetAdminPassword: catchAsync(async (req, res, next) => {
     const { email } = req.body;
-    if (!email) return res.badRequest(Message.badRequest);
-    let user;
-    user = await Model.User.findOne({ email });
 
-    if (!user) throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
-    // if (user.isEmailConfirmed == false) throw new HTTPError(Status.BAD_REQUEST, "Your account is not verfied");
-    const otp = otpService.issue();
-    const otpExpiryCode = moment().add(10, "minutes").valueOf();
-    const tempPassword = referralCodes.generate({
-      length: 8,
-      charset: referralCodes.charset("alphanumeric"),
-    })[0];
-    // console.log(tempPassword,"tempPassword===>")
-    encrypt.genSalt(10, (error, salt) => {
-      if (error) return console.log(error);
-      encrypt.hash(tempPassword, salt, async (error, hash) => {
-        // if (user) {
-        await Model.User.findOneAndUpdate(
-          { _id: user._id },
-          { $set: { password: hash } }
-        );
-        //   // const token = `GHA ${Services.JwtService.issue({
-        //   //   id: Services.HashService.encrypt(user._id),
-        //   // })}`;
-        //   // user = { ...user._doc, usertype: "User" };
-        //   // return res.ok("Password updated successfully and", user);
-        // }
-      });
-    });
+    if (!email) {
+      return res.badRequest(Message.badRequest);
+    }
 
-    // if (user) {
-    //   await Model.User.findOneAndUpdate({ _id: user._id }, { $set: { otp: otp, otpExpiry: otpExpiryCode } });
-    // }
-    let replacements = {
-      // otp,
-      tempPassword,
-    };
-    // const token =  Services.JwtService.issue({
-    //   id: Services.HashService.encrypt(user._id),
-    // })
-    // console.log(token)
-    await Services.EmailService.sendEmail(
-      "public/otpResetPass.html",
-      replacements,
-      email,
-      "Forget Password | In VAGABOND"
+    try {
+      let user = await Model.Admin.findOne({ email });
+
+      if (!user) {
+        throw new HTTPError(Status.BAD_REQUEST, Message.userNotFound);
+      }
+      // Generate a unique token for password reset
+      const resetToken = crypto.randomBytes(20).toString("hex");
+
+      // Set the reset token and its expiry in the user document
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = Date.now() + 600000; // Token expires in 10 minutes
+
+      // Save the user document with the reset token
+      await user.save();
+
+      // Send email with the reset link
+      const resetLink = `http://localhost:3000/forgetPassword?token=${resetToken}`;
+
+      // Send email with temporary password
+      const replacements = {
+        resetLink,
+      };
+
+      await Services.EmailService.sendEmail(
+        resetLink,
+        "otp",
+        email,
+        "Change Password Link"
     );
-    return res.ok(
-      "Temporary password  has been sent to your registered email."
-    );
+    
+      return res.ok("Reset Link has been sent to your registered email.");
+    } catch (error) {
+      // Handle errors
+      if (error instanceof HTTPError) {
+        return res.status(error.status).send(error.message);
+      }
+      console.error(error); // Log other unexpected errors for debugging
+      return res.status(Status.INTERNAL_SERVER_ERROR).send(Message.serverError);
+    }
   }),
-  updatePassword: catchAsync(async (req, res, next) => {
-    const { otp, newPassword } = req.body;
-    if (!otp || !newPassword)
+  updateAdminPassword: catchAsync(async (req, res, next) => {
+    const { newPassword } = req.body;
+    const { token } = req.query;
+    console.log(token, "token");
+    if (!newPassword)
       return res.status(400).json({
         success: false,
         message: Message.badRequest,
         data: null,
       });
     let user;
-    user = await Model.User.findOne({ otp });
+    user = await Model.Admin.findOne({
+      resetPasswordToken: token,
+    });
     //User not found
     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
     if (user) {
@@ -157,25 +157,30 @@ module.exports = {
         message: Message.passwordTooWeak,
         data: null,
       });
-    encrypt.genSalt(10, (error, salt) => {
-      if (error) return console.log(error);
-      encrypt.hash(newPassword, salt, async (error, hash) => {
-        if (user) {
-          await Model.User.findOneAndUpdate(
-            { _id: user._id },
-            { $set: { password: hash }, $unset: { otp: 1, otpExpiry: 1 } }
-          );
-          // const token = `GHA ${Services.JwtService.issue({
-          //   id: Services.HashService.encrypt(user._id),
-          // })}`;
-          user = { ...user._doc, usertype: "User" };
-          return res.ok("Password updated successfully", user);
-        }
-      });
-    });
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newPassword, salt);
+
+    // Update the user's password in the database
+    await Model.Admin.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $set: {
+          password: hash,
+        },
+        $unset: {
+          resetPasswordToken: 1,
+          otp: 1,
+          otpExpiry: 1,
+          resetPasswordExpires: 1,
+        },
+      }
+    );
+
+    return res.ok("Password has been successfully reset.");
   }),
 
-  changePassword: catchAsync(async (req, res, next) => {
+  changeAdminPassword: catchAsync(async (req, res, next) => {
     // this user get from authenticated user
     const verifiedUser = req.user;
     const { currentPassword, newPassword } = req.body;
@@ -186,7 +191,7 @@ module.exports = {
         data: null,
       });
     let user;
-    user = await Model.User.findOne({ _id: verifiedUser._id });
+    user = await Model.Admin.findOne({ _id: verifiedUser._id });
     //User not found
     if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
     if (user) {
@@ -202,20 +207,20 @@ module.exports = {
         data: null,
       });
 
-    encrypt.compare(currentPassword, user.password, (err, match) => {
+    bcrypt.compare(currentPassword, user.password, (err, match) => {
       if (match) {
-        encrypt.genSalt(10, (error, salt) => {
+        bcrypt.genSalt(10, (error, salt) => {
           if (error) return console.log(error);
-          encrypt.hash(newPassword, salt, async (error, hash) => {
+          bcrypt.hash(newPassword, salt, async (error, hash) => {
             if (user) {
-              await Model.User.findOneAndUpdate(
+              await Model.Admin.findOneAndUpdate(
                 { _id: user._id },
                 { $set: { password: hash } }
               );
               // const token = `GHA ${Services.JwtService.issue({
               //   id: Services.HashService.encrypt(user._id),
               // })}`;
-              user = { ...user._doc, usertype: "User" };
+              user = { ...user._doc };
               return res.ok("Password updated successfully", user);
             }
           });
@@ -266,7 +271,7 @@ module.exports = {
         emailMessage,
         otp,
         email,
-        "User Account Email Verification | vagabond"
+        "User Account Email Verification "
       );
       // let otpCode = {
       //   otp,

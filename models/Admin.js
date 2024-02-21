@@ -54,6 +54,12 @@ const AdminModel = new Schema(
     password: {
       type: String,
     },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires :{
+      type: String,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

@@ -5,6 +5,7 @@ const path = require("path");
 const Multer = require("multer");
 const fs = require("fs");
 const Authentication = require("../../policy/index");
+const AuthenticatedRole=require("../../policy/index")
 const userStorage = Multer.diskStorage({
   // destination: (req, file, cb) => {
   //   cb(null, "./public/images");
@@ -70,5 +71,15 @@ router.route("/getSingleUser/:id").get(
 router.route("/deleteSingleUser/:id").delete(
   Authentication.AdminAuth,
   Controller.AdminAuthController.deleteUser
+);
+router.route("/forgetAdminPassword").post(
+  Controller.AdminAuthController.forgetAdminPassword
+);
+router.route("/updateAdminPassword").put(
+  Controller.AdminAuthController.updateAdminPassword
+);
+router.route("/changeDashboardPassword").post(
+  Authentication.AdminAuth,
+  Controller.AdminAuthController.changeAdminPassword
 );
 module.exports = router;
