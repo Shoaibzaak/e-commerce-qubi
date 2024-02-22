@@ -180,54 +180,67 @@ module.exports = {
   }),
 
   changeAdminPassword: catchAsync(async (req, res, next) => {
-    // this user get from authenticated user
-    const verifiedUser = req.user;
-    const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword)
-      return res.status(400).json({
-        success: false,
-        message: Message.required,
-        data: null,
-      });
-    let user;
-    user = await Model.Admin.findOne({ _id: verifiedUser._id });
-    //User not found
-    if (!user) throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
-    if (user) {
-    }
-    if (
-      !validatePassword({
-        password: newPassword,
-      })
-    )
-      return res.status(400).json({
-        success: false,
-        message: Message.passwordTooWeak,
-        data: null,
-      });
-
-    bcrypt.compare(currentPassword, user.password, (err, match) => {
-      if (match) {
-        bcrypt.genSalt(10, (error, salt) => {
-          if (error) return console.log(error);
-          bcrypt.hash(newPassword, salt, async (error, hash) => {
-            if (user) {
+    try {
+      // Get authenticated user
+      const verifiedUser = req.user;
+      const { currentPassword, newPassword } = req.body;
+  
+      // Validate input
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: Message.required,
+          data: null,
+        });
+      }
+  
+      // Find admin user
+      let user = await Model.Admin.findOne({ _id: verifiedUser._id });
+  
+      // Handle user not found
+      if (!user) {
+        throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
+      }
+  
+      // Check if the new password meets criteria
+      if (!validatePassword({ password: newPassword })) {
+        return res.status(400).json({
+          success: false,
+          message: Message.passwordTooWeak,
+          data: null,
+        });
+      }
+  
+      // Compare current password with hashed password
+      bcrypt.compare(currentPassword, user.password, async (err, match) => {
+        if (match) {
+          // Generate salt and hash new password
+          bcrypt.genSalt(10, async (error, salt) => {
+            if (error) throw error;
+  
+            bcrypt.hash(newPassword, salt, async (error, hash) => {
+              if (error) throw error;
+  
+              // Update user password in the database
               await Model.Admin.findOneAndUpdate(
                 { _id: user._id },
                 { $set: { password: hash } }
               );
-              // const token = `GHA ${Services.JwtService.issue({
-              //   id: Services.HashService.encrypt(user._id),
-              // })}`;
+  
+              // Respond with success message and updated user
               user = { ...user._doc };
               return res.ok("Password updated successfully", user);
-            }
+            });
           });
-        });
-      } else {
-        return res.badRequest("Invalid Credentials");
-      }
-    });
+        } else {
+          // Incorrect credentials
+          return res.badRequest("Invalid Credentials");
+        }
+      });
+    } catch (error) {
+      // Handle any unexpected errors
+      next(error);
+    }
   }),
   registerAdmin: async (req, res, next) => {
     try {
