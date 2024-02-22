@@ -70,7 +70,7 @@ module.exports = {
     // })
     // console.log(token)
      // Construct the email message with the OTP
-     const emailMessage = `Thank you for registering with WE DON'T KNOW WHAT WE HAVE.\n\nYour verification code is: ${otp}`;
+     const emailMessage = `Thank you for registering with We Have And You Have!\n\nYour verification code is: ${otp}`;
     await Services.EmailService.sendEmail(
       emailMessage,
       otp,
@@ -263,7 +263,7 @@ module.exports = {
       // });
       await User.save();
       // Construct the email message with the OTP
-      const emailMessage = `Thank you for registering with MATT.\n\nYour verification code is: ${otp}`;
+      const emailMessage = `Thank you for registering with We Have And You Have!.\n\nYour verification code is: ${otp}`;
 
       // Send the email with the message directly
       await Services.EmailService.sendEmail(
