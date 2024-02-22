@@ -104,7 +104,7 @@ module.exports = {
       await user.save();
 
       // Send email with the reset link
-      const resetLink = `http://localhost:3000/forgetPassword?token=${resetToken}`;
+      const resetLink = ` https://qubi-admin-dashboard.vercel.app//forgetPassword?token=${resetToken}`;
 
       // Send email with temporary password
       const replacements = {
