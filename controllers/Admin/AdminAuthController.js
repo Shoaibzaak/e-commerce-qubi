@@ -202,46 +202,33 @@ module.exports = {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
   
-      // Check if the new password meets criteria
-      if (!validatePassword({ password: newPassword })) {
-        return res.status(400).json({
-          success: false,
-          message: Message.passwordTooWeak,
-          data: null,
-        });
-      }
-  
       // Compare current password with hashed password
-      bcrypt.compare(currentPassword, user.password, async (err, match) => {
-        if (match) {
-          // Generate salt and hash new password
-          bcrypt.genSalt(10, async (error, salt) => {
-            if (error) throw error;
+      const match = await bcrypt.compare(currentPassword, user.password);
   
-            bcrypt.hash(newPassword, salt, async (error, hash) => {
-              if (error) throw error;
+      if (match) {
+        // Generate salt and hash new password
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(newPassword, salt);
   
-              // Update user password in the database
-              await Model.Admin.findOneAndUpdate(
-                { _id: user._id },
-                { $set: { password: hash } }
-              );
+        // Update user password in the database
+        await Model.Admin.findOneAndUpdate(
+          { _id: user._id },
+          { $set: { password: hash } }
+        );
   
-              // Respond with success message and updated user
-              user = { ...user._doc };
-              return res.ok("Password updated successfully", user);
-            });
-          });
-        } else {
-          // Incorrect credentials
-          return res.badRequest("Invalid Credentials");
-        }
-      });
+        // Respond with success message and updated user
+        user = { ...user._doc };
+        return res.ok("Password updated successfully", user);
+      } else {
+        // Incorrect credentials
+        return res.badRequest("Invalid Credentials");
+      }
     } catch (error) {
       // Handle any unexpected errors
       next(error);
     }
   }),
+  
   registerAdmin: async (req, res, next) => {
     try {
       const { firstName, lastName, email, password } = req.body;
