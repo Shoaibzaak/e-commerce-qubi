@@ -186,7 +186,7 @@ module.exports = {
     if (!currentPassword || !newPassword)
       return res.status(400).json({
         success: false,
-        message: Message.badRequest,
+        message: Message.required,
         data: null,
       });
     let user;
