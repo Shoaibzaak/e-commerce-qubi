@@ -78,7 +78,7 @@ router.route("/forgetAdminPassword").post(
 router.route("/updateAdminPassword").put(
   Controller.AdminAuthController.updateAdminPassword
 );
-router.route("/resendAdminOtp").post(
+router.route("/resendAdminOtp/:email").get(
   Controller.AdminAuthController.resendAdminOtp
 );
 router.route("/changeDashboardPassword").post(

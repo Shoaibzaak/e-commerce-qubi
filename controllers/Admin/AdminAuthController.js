@@ -52,7 +52,7 @@ module.exports = {
   }),
   //resend otp to email
   resendAdminOtp: catchAsync(async (req, res, next) => {
-    const { email } = req.body;
+    const { email } = req.params;
     if (!email) throw new HTTPError(Status.BAD_REQUEST, Message.required);
     if (!Validation.validateEmail(email)) {
       return res.badRequest("Invalid email format");
