@@ -457,7 +457,7 @@ module.exports = {
         throw new HTTPError(Status.NOT_FOUND, "User not found");
       }
 
-      const message = "Admin Data updated successfully";
+      const message = " Data updated successfully";
       console.log(message);
       res.ok(message, result);
     } catch (error) {

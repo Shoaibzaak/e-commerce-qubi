@@ -75,7 +75,7 @@ router
   .route("/getAllProducts")
   .get(
     Authentication.AdminAuth,
-    AuthenticatedRole.isVendor,
+    // AuthenticatedRole.isAdmin,
     Controller.ProductController.getAllProductAdmin
   );
 // get all  Products with details
