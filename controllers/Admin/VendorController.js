@@ -5,17 +5,16 @@ const Message = require("../../Message");
 const responseHelper = require("../../helper/response.helper");
 const Status = require("../../status");
 const catchAsync = require("../../utils/catchAsync");
-const referralCodes = require("referral-codes");
 const Validation = require("../../utils/validations/validation");
 const Services = require("../../services");
-
+const cloudUpload = require("../../cloudinary");
 module.exports = {
   // Retrieve Vendor user by VendorId
   getVendorUser: catchAsync(async (req, res, next) => {
     // Extract the VendorId from the request parameters
     const vendorId = req.params.id;
     // Perform a database query to find the vendor user by VendorId
-    const vendorUser = await Model.Vendor.findById(vendorId);
+    const vendorUser = await Model.Vendor.findById(vendorId).populate("address");
 
     // Check if the vendor user is found
     if (!vendorUser) {
@@ -29,43 +28,63 @@ module.exports = {
   // Create a new Vendor
   createVendor: catchAsync(async (req, res, next) => {
     try {
-      const { firstName, lastName, email } = req.body;
-
+      const { firstName, lastName, email, phoneNumber, bio } = req.body;
+      const { address } = req.body;
+  
       // Email validation
-      if (!Validation.validateEmail(email)) {
-        return res.badRequest("Invalid email format");
-      }
+      // if (!Validation.validateEmail(email)) {
+      //   return res.badRequest("Invalid email format");
+      // }
+  
       const verifyEmail = await Model.Vendor.findOne({ email });
-
+  
       if (verifyEmail) {
         throw new HTTPError(Status.BAD_REQUEST, Message.emailAlreadyExists);
       }
-      const tempPassword = referralCodes.generate({
-        length: 8,
-        charset: referralCodes.charset("dummyPassword"),
-      })[0];
-      console.log();
+  
+      let cloudinaryResult;
+      if (req.files.profilePic) {
+        const file = req.files.profilePic[0]; // Assuming you only want to handle one profile picture
+        const { path } = file;
+  
+        // Upload the file to Cloudinary
+        cloudinaryResult = await cloudUpload.cloudinaryUpload(path);
+      }
+  
+      let savedAddress;
+  
+      if (address) {
+        const addressData = JSON.parse(address);
+           savedAddress = await new Model.Address(addressData).save();
+      }      
+    //call the dummyPassword to get the 8 characters password  
+    const tempPassword=Services.DummyPassword.dummyPassword(8)
       const vendor = new Model.Vendor({
         firstName,
         lastName,
         email,
+        profilePic: cloudinaryResult,
+        phoneNumber,
+        bio,
         password: tempPassword,
+        address: savedAddress ? savedAddress._id : null, // Save address _id in vendor model
       });
-
+  
       await vendor.save();
+  
       const emailMessage = `
-Dear ${firstName} ${lastName},
-
-You are added by admin of MATT.
-
-Your temporary password is: ${tempPassword}
-
-Use your temporary password ${tempPassword} and gmail ${email} to login
-
-Best regards,
-The MATT Team
-`;
-
+        Dear ${firstName} ${lastName},
+  
+        You are added by admin of MATT.
+  
+        Your temporary password is: ${tempPassword}
+  
+        Use your temporary password ${tempPassword} and gmail ${email} to login
+  
+        Best regards,
+        The MATT Team
+      `;
+  
       // Send the email with the message directly
       await Services.EmailService.sendEmail(
         emailMessage,
@@ -73,19 +92,19 @@ The MATT Team
         email,
         "User Account Email Verification | vagabond"
       );
-
-      return res.ok("Vendor registered successfully .", vendor);
+  
+      return res.ok("Vendor registered successfully.", vendor);
     } catch (err) {
       next(err);
     }
   }),
-
+  
   // Get all Vendor users with full details
   getAllVendorUsers: catchAsync(async (req, res, next) => {
     console.log("Vendordetails is called");
     try {
       // Fetch all Vendors without pagination
-      const vendors = await Model.Vendor.find({ isDeleted: false }).sort(
+      const vendors = await Model.Vendor.find({ isDeleted: false }).populate("address").sort(
         "-_id"
       );
 

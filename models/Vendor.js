@@ -27,6 +27,13 @@ const vendorModel = new Schema(
     password: {
       type: String,
     },
+    bio: {
+      type: String,
+    },
+    address: {
+      type: Schema.Types.ObjectId,
+      ref: "Address",
+    },
     isDeleted: {
       type: Boolean,
       default: false,

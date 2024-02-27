@@ -3,4 +3,5 @@ module.exports = {
   HashService: require("./HashService"),
   EmailService: require("./EmailService"),
   OtpService: require("./OtpService"),
+  DummyPassword: require("./DummyPassword"),
 };

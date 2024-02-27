@@ -2,13 +2,13 @@ const express = require("express");
 const Controller = require("../../controllers/index");
 const router = express.Router();
 const path = require("path");
-const multer = require("multer");
+const Multer = require("multer");
 const Authentication = require("../../policy/index");
 
-const userStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "./public/images");
-  },
+const userStorage = Multer.diskStorage({
+  // destination: (req, file, cb) => {
+  //   cb(null, "./public/images");
+  // },
   filename: (req, file, cb) => {
     cb(
       null,
@@ -16,8 +16,10 @@ const userStorage = multer.diskStorage({
     );
   },
 });
+// const storage = new Multer.memoryStorage();
 
-var upload = multer({ //multer settings
+
+var upload = Multer({ //multer settings
   storage: userStorage,
   fileFilter: function (req, file, callback) {
     var ext = path.extname(file.originalname);
@@ -33,8 +35,13 @@ var upload = multer({ //multer settings
 
 //post custom vendor 
 router.route("/createVendor").post(
-
-//   Authentication.AdminAuth,
+// Authentication.AdminAuth,
+upload.fields([
+  {
+    name: "profilePic",
+    maxCount: 1,
+  },
+]),
   Controller.VendorController.createVendor);
 
 //update Vendor
