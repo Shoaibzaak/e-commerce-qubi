@@ -86,17 +86,39 @@ module.exports = {
     console.log("Categorydetails is called");
     try {
       // Fetch all categories without pagination and populate parentCategory
-      const categories = await Model.Category.find({ isDeleted: false })
+      if(req.query){
+        
+        let parentCategory = req.query.parentCategory
+        let subcategories = await Model.Category.find({ isDeleted: false ,parentCategory:parentCategory }).select("_id categoryName")
+        .sort("-_id")
+        const CategorySize = subcategories.length;
+
+      const result = {
+        Category: subcategories,
+        count: CategorySize,
+      };
+
+      // Check if no categories are found
+    
+
+      // Return a success response with the result
+      return responseHelper.success(
+        res,
+        result,
+        "subCategorydetails found successfully"
+      );
+      }
+
+      const parentCategories = await Model.Category.find({ isDeleted: false,parentCategory:null })
         .sort("-_id")
         .populate({
           path: "parentCategory",
           select: "_id categoryName",
         });
-
-      const CategorySize = categories.length;
+      const CategorySize = parentCategories.length;
 
       const result = {
-        Category: categories,
+        Category: parentCategories,
         count: CategorySize,
       };
 
@@ -171,7 +193,6 @@ module.exports = {
     }
   }),
 
-  //======================Mat webiste api's
   getAllCategoryBrand: catchAsync(async (req, res, next) => {
     console.log("CategoryBranddetails is called");
     try {
