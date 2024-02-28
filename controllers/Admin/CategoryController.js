@@ -175,23 +175,38 @@ module.exports = {
   declineCategory: catchAsync(async (req, res, next) => {
     var CategoryId = req.params.id;
     try {
-      // Find the category by ID and update it to set isDeleted to true
-      const updatedCategory = await Model.Category.findByIdAndUpdate(
-        CategoryId,
-        { isDeleted: true },
-        { new: true } // To return the updated document
-      );
-
-      // If category is not found, return a bad request response
-      if (!updatedCategory)
-        return res.badRequest("Category not found in our records");
-
-      var message = "Category deleted successfully";
-      res.ok(message, updatedCategory);
+      const { childParams } = req.query;
+  
+      if (childParams) {
+        // If childParams exists, delete the category permanently
+        const deletedCategory = await Model.Category.findByIdAndDelete(CategoryId);
+  
+        // If category is not found, return a bad request response
+        if (!deletedCategory)
+          return res.badRequest("Category not found in our records");
+  
+        var message = "Category permanently deleted successfully";
+        res.ok(message, deletedCategory);
+      } else {
+        // If childParams doesn't exist, update the category to set isDeleted to true
+        const updatedCategory = await Model.Category.findByIdAndUpdate(
+          CategoryId,
+          { isDeleted: true },
+          { new: true }
+        );
+  
+        // If category is not found, return a bad request response
+        if (!updatedCategory)
+          return res.badRequest("Category not found in our records");
+  
+        var message = "Category marked as deleted successfully";
+        res.ok(message, updatedCategory);
+      }
     } catch (err) {
       throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
+  
 
   getAllCategoryBrand: catchAsync(async (req, res, next) => {
     console.log("CategoryBranddetails is called");
