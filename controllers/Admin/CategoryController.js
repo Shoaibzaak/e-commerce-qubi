@@ -178,16 +178,14 @@ module.exports = {
       const { childParams } = req.query;
 
       if (childParams) {
-        // If childParams exists, delete the category permanently
-        const deletedCategory = await Model.Category.findByIdAndDelete(
-          CategoryId
-        );
-
+        const deletedCategory = await Model.Category.findById(CategoryId);
+           
+        await deletedCategory.customUpdate({ isDeleted: true });
         // If category is not found, return a bad request response
         if (!deletedCategory)
           return res.badRequest("subCategory not found in our records");
 
-        var message = "SubCategory permanently deleted successfully";
+        var message = "SubCategory marked as deleted successfully";
         res.ok(message, deletedCategory);
       } else {
         // If childParams doesn't exist, update the category to set isDeleted to true
