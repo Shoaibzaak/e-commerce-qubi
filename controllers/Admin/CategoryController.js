@@ -176,37 +176,57 @@ module.exports = {
     var CategoryId = req.params.id;
     try {
       const { childParams } = req.query;
-  
+
       if (childParams) {
         // If childParams exists, delete the category permanently
-        const deletedCategory = await Model.Category.findByIdAndDelete(CategoryId);
-  
+        const deletedCategory = await Model.Category.findByIdAndDelete(
+          CategoryId
+        );
+
         // If category is not found, return a bad request response
         if (!deletedCategory)
-          return res.badRequest("Category not found in our records");
-  
-        var message = "Category permanently deleted successfully";
+          return res.badRequest("subCategory not found in our records");
+
+        var message = "SubCategory permanently deleted successfully";
         res.ok(message, deletedCategory);
       } else {
         // If childParams doesn't exist, update the category to set isDeleted to true
-        const updatedCategory = await Model.Category.findByIdAndUpdate(
-          CategoryId,
-          { isDeleted: true },
-          { new: true }
-        );
-  
-        // If category is not found, return a bad request response
+        const updatedCategory = await Model.Category.findById(CategoryId);
         if (!updatedCategory)
           return res.badRequest("Category not found in our records");
-  
-        var message = "Category marked as deleted successfully";
-        res.ok(message, updatedCategory);
+
+        try {
+          await updatedCategory.customUpdate({ isDeleted: true });
+          var message = "Category marked as deleted successfully";
+          res.ok(message, updatedCategory);
+        } catch (err) {
+          if (err.childCategories) {
+            // Handle the specific error from the middleware
+            return res.status(400).json({
+              error: "Cannot update category with child categories.",
+              childCategories: err.childCategories,
+            });
+          } else {
+            // Handle other errors
+            // Handle other errors
+    throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+          }
+        }
       }
     } catch (err) {
-      throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      console.log(err.message);
+      if (err.childCategories) {
+        // Handle the specific error from the middleware
+        return res.status(400).json({
+          error: "Cannot delete category with child categories.",
+          childCategories: err.childCategories,
+        });
+      } else {
+       // Handle other errors
+    throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
+      }
     }
   }),
-  
 
   getAllCategoryBrand: catchAsync(async (req, res, next) => {
     console.log("CategoryBranddetails is called");

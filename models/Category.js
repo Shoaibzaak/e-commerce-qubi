@@ -9,14 +9,9 @@ const categoryModel = new Schema(
     },
     parentCategory: {
       type: Schema.Types.ObjectId,
-      ref: 'Category', // Reference to the Category model
-      default: null,   // No parent category by default (top-level category)
+      ref: 'Category',
+      default: null,
     },
-    childCategories: [{
-      categoryName: {
-        type: String,
-      },
-    }],
     isFeatured: {
       type: Boolean,
       default: false,
@@ -25,9 +20,7 @@ const categoryModel = new Schema(
       type: Boolean,
       default: false,
     },
-   
   },
-
   {
     timestamps: true,
     strict: true,
@@ -41,5 +34,39 @@ categoryModel.set("toJSON", {
   },
 });
 
-const category = mongoose.model("Category", categoryModel);
-module.exports = category;
+categoryModel.methods.customUpdate = async function (updateFields) {
+  console.log("middleware is calling there====>");
+  try {
+    const categoryId = this._id;
+    console.log(categoryId, "categoryId");
+
+    // Check if the category has child categories
+    const childCategories = await this.model('Category').find({ parentCategory: categoryId });
+
+    if (childCategories.length > 0) {
+      const error = new Error('Cannot update category with child categories.');
+      error.childCategories = childCategories;
+      throw error;
+    }
+
+    // Check if the category is a child category
+    if (this.parentCategory) {
+      const parentCategory = await this.model('Category').findById(this.parentCategory);
+      if (parentCategory) {
+        const error = new Error('Cannot update a category that is a child category.');
+        throw error;
+      }
+    }
+
+    // No child categories found, proceed with the update
+    Object.assign(this, updateFields);
+    await this.save();
+
+    return this;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const Category = mongoose.model("Category", categoryModel);
+module.exports = Category;
