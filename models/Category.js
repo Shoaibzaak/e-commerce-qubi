@@ -49,14 +49,14 @@ categoryModel.methods.customUpdate = async function (updateFields) {
       throw error;
     }
 
-    // Check if the category is a child category
-    if (this.parentCategory) {
-      const parentCategory = await this.model('Category').findById(this.parentCategory);
-      if (parentCategory) {
-        const error = new Error('Cannot update a category that is a child category.');
-        throw error;
-      }
-    }
+    // // Check if the category is a child category
+    // if (this.parentCategory) {
+    //   const parentCategory = await this.model('Category').findById(this.parentCategory);
+    //   if (parentCategory) {
+    //     const error = new Error('Cannot update a category that is a child category.');
+    //     throw error;
+    //   }
+    // }
 
     // No child categories found, proceed with the update
     Object.assign(this, updateFields);

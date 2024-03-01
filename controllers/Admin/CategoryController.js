@@ -216,7 +216,7 @@ module.exports = {
       if (err.childCategories) {
         // Handle the specific error from the middleware
         return res.status(400).json({
-          error: "Cannot delete category with child categories.",
+          error: "Cannot update category with child categories.",
           childCategories: err.childCategories,
         });
       } else {
