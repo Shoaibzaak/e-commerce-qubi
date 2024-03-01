@@ -34,6 +34,10 @@ const vendorModel = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Address",
     },
+    isEmailConfirmed: {
+      type: Boolean,
+      default: true,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

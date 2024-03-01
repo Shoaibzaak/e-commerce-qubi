@@ -179,4 +179,66 @@ module.exports = {
       throw new HTTPError(Status.INTERNAL_SERVER_ERROR, err);
     }
   }),
+  uploadVendorProfilePic: catchAsync(async (req, res, next) => {
+    const userData = req.body;
+    const { address } = req.body;
+    try {
+      if (req.files.profilePic) {
+        const file = req.files.profilePic[0]; // Assuming you only want to handle one profile picture
+        const { path } = file;
+
+        // Upload the file to Cloudinary
+        var cloudinaryResult = await cloudUpload.cloudinaryUpload(path);
+      }
+      // Fetch the user
+      const user = await Model.Vendor.findById(userData.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      // Handle address update
+      if (address) {
+        const addressData = JSON.parse(address);
+        let savedAddress;
+
+        // Check if user already has an address
+        if (user.address) {
+          savedAddress = await Model.Address.findByIdAndUpdate(
+            user.address,
+            addressData,
+            { new: true }
+          );
+        } else {
+          savedAddress = await new Model.Address(addressData).save();
+        }
+
+        user.address = savedAddress._id;
+      }
+      const result = await Model.Vendor.findByIdAndUpdate(
+        { _id: userData.userId },
+        {
+          profilePic: cloudinaryResult,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          email: userData.email,
+          phoneNumber: userData.phoneNumber,
+          bio: userData.bio,
+          address: user.address,
+        },
+        { new: true, runValidators: true }
+      );
+      if (!result) {
+        console.log("User not found");
+        throw new HTTPError(Status.NOT_FOUND, "User not found");
+      }
+
+      const message = " Data updated successfully";
+      console.log(message);
+      res.ok(message, result);
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }),
 };

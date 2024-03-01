@@ -43,11 +43,16 @@ upload.fields([
   },
 ]),
   Controller.VendorController.createVendor);
-
-//update Vendor
-router.route("/updateVendor").put(
-//   Authentication.AdminAuth,
-  Controller.VendorController.updateVendor);
+  router.route("/updateVendor").put(
+    // Authentication.AdminAuth,
+    upload.fields([
+      {
+        name: "profilePic",
+        maxCount: 1,
+      },
+    ]),
+      Controller.VendorController.uploadVendorProfilePic);
+    
 
 //delete Vendor
 router.route("/deleteVendor/:id").delete(
