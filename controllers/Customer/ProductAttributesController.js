@@ -36,7 +36,7 @@ module.exports = {
         ProductAttributesData
       );
       await ProductAttributes.save();
-      return res.ok(ProductAttributes)
+      return res.json(ProductAttributes)
     } catch (error) {
       throw new HTTPError(Status.INTERNAL_SERVER_ERROR, error);
     }
