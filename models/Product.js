@@ -100,6 +100,10 @@ const productModel = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProductAttributes",
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+    },
     variations: [variationSchema],
     // reviews: [{
     //   type: mongoose.Schema.Types.ObjectId,
