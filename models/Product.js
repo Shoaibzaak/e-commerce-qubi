@@ -18,9 +18,7 @@ const variationSchema = new Schema({
     // unique: true,
     // required: true,
   },
-  
 });
-
 
 const productModel = new Schema(
   {
@@ -86,7 +84,8 @@ const productModel = new Schema(
       required: true,
       default: "simple", // Default to simple product type
     },
-    sku: {  // SKU field directly under product for simple products
+    sku: {
+      // SKU field directly under product for simple products
       type: String,
       // unique: true,
     },
@@ -95,7 +94,11 @@ const productModel = new Schema(
     },
     size: {
       type: String,
-      enum: ["Small", "Medium", "Large"]
+      enum: ["Small", "Medium", "Large"],
+    },
+    productAttributes: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductAttributes",
     },
     variations: [variationSchema],
     // reviews: [{
@@ -117,7 +120,6 @@ const productModel = new Schema(
     strict: true,
   }
 );
-
 
 productModel.set("toJSON", {
   virtuals: false,

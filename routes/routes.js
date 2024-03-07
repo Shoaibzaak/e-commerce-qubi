@@ -14,4 +14,5 @@ router.use("/auth/user", Routes.UserAuthRoutes);
 router.use("/user/order", Routes.OrderRoutes);
 router.use("/user/product", Routes.ProductUserRoutes);
 router.use("/user/contact", Routes.ContactRoutes);
+router.use("/user/productAttribute", Routes.ProductAttributesRoutes);
 module.exports = router;

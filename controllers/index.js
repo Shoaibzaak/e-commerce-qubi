@@ -12,5 +12,6 @@ module.exports = {
   UserAuthController: require("./Customer/UserAuthController"),
   OrderController: require("./Customer/OrderController"),
   ContactController: require("./Customer/ContactController"),
-  ProductUserController: require("./Customer/ProductUserController")
+  ProductUserController: require("./Customer/ProductUserController"),
+  ProductAttributesController: require("./Customer/ProductAttributesController")
 };
