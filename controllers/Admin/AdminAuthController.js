@@ -340,6 +340,11 @@ module.exports = {
       if (!user) {
         throw new HTTPError(Status.NOT_FOUND, Message.userNotFound);
       }
+      if (!user.isEmailConfirmed) {
+        return res.badRequest(
+          "Email not confirmed. Please confirm your email via otp."
+        );
+      }
       const newFieldValue = "new value";
       const match = await bcrypt.compare(password, user.password);
 
