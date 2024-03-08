@@ -163,14 +163,6 @@ module.exports = {
         limit: limit,
       };
 
-      if (ProductSize === 0) {
-        // If no products are found, return a not found response
-        return responseHelper.requestfailure(
-          res,
-          "Productdetails do not exist."
-        );
-      }
-
       // Return a success response with status code 200
       return responseHelper.success(res, result, message);
     } catch (error) {
