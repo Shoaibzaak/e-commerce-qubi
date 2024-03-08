@@ -82,7 +82,6 @@ module.exports = {
     console.log("createProduct is called");
     try {
       var ProductData = req.body;
-      console.log(ProductData, "ProductData");
       const files = req.files;
       // Validate and set unique SKUs
       if (ProductData.productType === "simple") {

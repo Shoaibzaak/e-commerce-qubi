@@ -47,12 +47,6 @@ const productModel = new Schema(
       type: Number,
       default: 0,
     },
-    // use for invidual ratings given by user
-    ratings: [
-      {
-        type: Number,
-      },
-    ],
     type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -85,7 +79,7 @@ const productModel = new Schema(
       default: "simple", // Default to simple product type
     },
     sku: {
-      // SKU field directly under product for simple products
+      // SKU field directly under the product for simple products
       type: String,
       // unique: true,
     },
@@ -96,9 +90,9 @@ const productModel = new Schema(
       type: String,
       enum: ["Small", "Medium", "Large"],
     },
-    productAttributes: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ProductAttributes",
+    // Allow for additional attributes dynamically
+    customAttributes: {
+      type: Schema.Types.Mixed,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -118,10 +112,9 @@ const productModel = new Schema(
       default: false,
     },
   },
-
   {
     timestamps: true,
-    strict: true,
+    strict: false, // Allow for dynamic attributes
   }
 );
 

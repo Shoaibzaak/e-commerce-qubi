@@ -41,7 +41,7 @@ router.route("/createProduct").post(
   //   },
   // ]),
   upload.array('images'),
-  Authentication.AdminAuth,
+  // Authentication.AdminAuth,
   Controller.ProductController.createProduct
 );
 

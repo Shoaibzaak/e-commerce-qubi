@@ -9,7 +9,5 @@ module.exports = {
   Contact :require("./Contact"),
   Address :require("./Address"),
   DeletionReason :require("./DeletionReason"),
-  Vendor :require("./Vendor"),
-  ProductAttributes :require("./ProductAttributes"),
- 
+  Vendor :require("./Vendor")
 };
