@@ -43,10 +43,6 @@ const productModel = new Schema(
       type: Number,
       min: 0,
     },
-    productRate: {
-      type: Number,
-      default: 0,
-    },
     type: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
