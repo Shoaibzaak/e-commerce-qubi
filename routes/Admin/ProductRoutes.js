@@ -78,6 +78,13 @@ router
     // AuthenticatedRole.isAdmin,
     Controller.ProductController.getAllProductAdmin
   );
+
+  router
+  .route("/getAllVendorProducts/:userId")
+  .get(
+    Authentication.AdminAuth,
+    Controller.ProductController.getAllProductVendor
+  );
 // get all  Products with details
 router
   .route("/getAllWhishLists")

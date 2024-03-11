@@ -443,4 +443,49 @@ module.exports = {
         responseHelper.requestfailure(res, error);
       }
     }),
+    getAllProductVendor: catchAsync(async (req, res, next) => {
+      console.log("Productdetails is called");
+      try {
+        const pageNumber = parseInt(req.query.pageNumber) || 0;
+        const limit = parseInt(req.query.limit) || 10;
+    
+        // Extract user ID from request parameters, adjust this based on your actual route structure
+        const userId = req.params.userId;
+    
+        if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0 || !userId) {
+          return res.badRequest("Invalid query parameters");
+        }
+    
+        const message = "Productdetails found successfully";
+    
+        const skipValue = pageNumber * limit - limit;
+    
+        if (skipValue < 0) {
+          return res.badRequest("Invalid combination of pageNumber and limit.");
+        }
+    
+        // Modify the query to filter products by userId
+        const productsTotal = await Model.Product.find({ userId: userId });
+        const products = await Model.Product.find({ userId: userId })
+          .skip(skipValue)
+          .limit(limit)
+          .sort("-_id")
+          .populate("type")
+          .populate("brand");
+    
+        const productSize = productsTotal.length;
+    
+        const result = {
+          Product: products,
+          totalProducts: productSize,
+          limit: limit,
+        };
+    
+        return responseHelper.success(res, result, message);
+      } catch (error) {
+        responseHelper.requestfailure(res, error);
+      }
+    }),
+    
+    
 };
