@@ -273,18 +273,24 @@ module.exports = {
     console.log("Categorydetails is called");
     try {
       // Find parent categories with non-empty childCategories array
-      const parentCategories = await Model.Category.find({ isDeleted: false, parentCategory:null,childCategories: { $exists: true, $not: { $size: 0 } } })
+      const parentCategories = await Model.Category.find({ isDeleted: false, parentCategory: null, childCategories: { $exists: true, $not: { $size: 0 } } })
         .sort("-_id")
         .populate({
           path: "childCategories",
           select: "_id categoryName",
         });
-        
+      
+      // Find categories where parentCategory is null and childCategories is empty
+      const nullParentCategories = await Model.Category.find({ isDeleted: false, parentCategory: null, childCategories: { $exists: true, $size: 0 } })
+        .select("_id categoryName");
+      
+      // Merge the nullParentCategories with parentCategories
+      const mergedCategories = [...parentCategories, ...nullParentCategories];
   
-      const CategorySize = parentCategories.length;
+      const CategorySize = mergedCategories.length;
   
       const result = {
-        Category: parentCategories,
+        Category: mergedCategories,
         count: CategorySize,
       };
   
@@ -292,12 +298,13 @@ module.exports = {
       return responseHelper.success(
         res,
         result,
-        "Categorydetails found successfully"
+        "Category details found successfully"
       );
     } catch (error) {
       // Handle errors and return a failure response
       responseHelper.requestfailure(res, error);
     }
-  }),
+  })
+
   
 };
