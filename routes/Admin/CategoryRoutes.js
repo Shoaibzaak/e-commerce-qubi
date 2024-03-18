@@ -60,9 +60,9 @@ router.route("/getAllCategories").get(
   // Authentication.AdminAuth,
   Controller.CategoryController.getAllCategoryUsers);
 
-  router.route("/getAllCategories").get(
-    // Authentication.AdminAuth,
-    Controller.CategoryController.getAllCategoryUsers);
+  // router.route("/getAllCategories").get(
+  //   // Authentication.AdminAuth,
+  //   Controller.CategoryController.getAllCategoryUsers);
     
   router.route("/getAllParentCategories").get(
     // Authentication.AdminAuth,

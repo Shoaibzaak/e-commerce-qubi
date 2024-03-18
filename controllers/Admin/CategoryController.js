@@ -105,7 +105,14 @@ module.exports = {
 
       // Check if no categories are found
     
-
+      if (CategorySize === 0) {
+        // Return an empty array as the result
+        return responseHelper.success(
+          res,
+          [],
+          "No subcategories found"
+        );
+      }
       // Return a success response with the result
       return responseHelper.success(
         res,
