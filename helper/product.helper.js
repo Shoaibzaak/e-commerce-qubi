@@ -49,7 +49,8 @@ module.exports = {
 
         const Product= await Model.Product.findById(id)
         .populate("type")
-        .populate("brand");
+        .populate("brand")
+        .populate("childCategory");
 
 
 
