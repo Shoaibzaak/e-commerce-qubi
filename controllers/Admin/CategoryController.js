@@ -266,7 +266,7 @@ module.exports = {
     console.log("Categorydetails is called");
     try {
       // Find parent categories with non-empty childCategories array
-      const parentCategories = await Model.Category.find({ isDeleted: false, childCategories: { $exists: true, $not: { $size: 0 } } })
+      const parentCategories = await Model.Category.find({ isDeleted: false, parentCategory:null,childCategories: { $exists: true, $not: { $size: 0 } } })
         .sort("-_id")
         .populate({
           path: "childCategories",
