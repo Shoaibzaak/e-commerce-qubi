@@ -31,7 +31,7 @@ var upload = multer({ //multer settings
   }
 })
 
-//post custom Family 
+//post custom category 
 router.route("/createCategory").post(
 //   upload.fields([
 //     {
@@ -42,26 +42,31 @@ router.route("/createCategory").post(
   // Authentication.AdminAuth,
   Controller.CategoryController.createCategory);
 
-//update Family
+//update category
 router.route("/updateCategory").post(
   // Authentication.AdminAuth,
   Controller.CategoryController.updateCategory);
 
-//delete Family
+//delete category
 router.route("/deleteCategory/:id").delete(
   // Authentication.AdminAuth,
   Controller.CategoryController.declineCategory);
 
-
-// get Family by id
 router.route("/findCategoryById/:id").get(
   // Authentication.AdminAuth,
   Controller.CategoryController.getCategoryUser);
 
-  // get all  Familys with details
 router.route("/getAllCategories").get(
   // Authentication.AdminAuth,
   Controller.CategoryController.getAllCategoryUsers);
+
+  router.route("/getAllCategories").get(
+    // Authentication.AdminAuth,
+    Controller.CategoryController.getAllCategoryUsers);
+    
+  router.route("/getAllParentCategories").get(
+    // Authentication.AdminAuth,
+    Controller.CategoryController.getAllCategoryParentWise);
 
 
 

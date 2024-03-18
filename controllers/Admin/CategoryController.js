@@ -31,33 +31,38 @@ module.exports = {
   createCategory: catchAsync(async (req, res, next) => {
     console.log("createCategory is called");
     try {
-      const { categoryName, childCategories, parentId } = req.body;
-
+      const { categoryName, parentId } = req.body;
+  
       let parentCategory = null;
-
+  
       if (parentId) {
         parentCategory = await Model.Category.findById(parentId);
-
+  
         if (!parentCategory) {
           return res.status(404).json({ message: "Parent category not found" });
         }
       }
-
+  
       const newCategory = new Model.Category({
         categoryName,
         parentCategory: parentId || null,
       });
-      // If childCategories are provided, add them to the new category's childCategories array
-      if (childCategories && Array.isArray(childCategories)) {
-        newCategory.childCategories = childCategories;
-      }
+  
       const savedCategory = await newCategory.save();
+  
+      // If parentCategory exists, update its childCategories array
+      if (parentCategory) {
+        parentCategory.childCategories.push(savedCategory._id);
+        await parentCategory.save();
+      }
+  
       res.json(savedCategory);
     } catch (error) {
       console.error(error);
       res.status(500).send(error?.message, "Server Error");
     }
   }),
+  
 
   // Get a list of Categorys
   getCategoryList: async (req, res) => {
@@ -256,4 +261,36 @@ module.exports = {
       responseHelper.requestfailure(res, error);
     }
   }),
+
+  getAllCategoryParentWise: catchAsync(async (req, res, next) => {
+    console.log("Categorydetails is called");
+    try {
+      // Find parent categories with non-empty childCategories array
+      const parentCategories = await Model.Category.find({ isDeleted: false, childCategories: { $exists: true, $not: { $size: 0 } } })
+        .sort("-_id")
+        .populate({
+          path: "childCategories",
+          select: "_id categoryName",
+        });
+        
+  
+      const CategorySize = parentCategories.length;
+  
+      const result = {
+        Category: parentCategories,
+        count: CategorySize,
+      };
+  
+      // Return a success response with the result
+      return responseHelper.success(
+        res,
+        result,
+        "Categorydetails found successfully"
+      );
+    } catch (error) {
+      // Handle errors and return a failure response
+      responseHelper.requestfailure(res, error);
+    }
+  }),
+  
 };

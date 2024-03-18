@@ -12,6 +12,10 @@ const categoryModel = new Schema(
       ref: 'Category',
       default: null,
     },
+    childCategories: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Category'
+    }],
     isFeatured: {
       type: Boolean,
       default: false,
