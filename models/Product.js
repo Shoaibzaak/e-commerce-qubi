@@ -47,6 +47,10 @@ const productModel = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
+     childCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
     store: {
       type: String,
     },
