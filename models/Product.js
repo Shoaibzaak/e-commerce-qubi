@@ -19,6 +19,18 @@ const variationSchema = new Schema({
     // required: true,
   },
 });
+const typeSchema = new Schema({
+  type: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+  },
+  childCategories: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    }
+  ]
+});
 
 const productModel = new Schema(
   {
@@ -43,14 +55,7 @@ const productModel = new Schema(
       type: Number,
       min: 0,
     },
-    type: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-    },
-     childCategory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-    },
+    typeAndChildCategory: typeSchema, // Combine type and childCategory into one object
     store: {
       type: String,
     },
