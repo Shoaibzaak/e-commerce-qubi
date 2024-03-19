@@ -70,6 +70,7 @@ const productModel = new Schema(
     quantity: {
       type: Number,
       min: 1,
+      default:1,
     },
     discount: {
       type: Number,
