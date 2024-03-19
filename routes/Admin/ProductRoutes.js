@@ -82,7 +82,7 @@ router
   router
   .route("/getAllVendorProducts/:userId")
   .get(
-    Authentication.AdminAuth,
+    // Authentication.AdminAuth,
     Controller.ProductController.getAllProductVendor
   );
 // get all  Products with details

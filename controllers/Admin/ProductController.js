@@ -152,8 +152,17 @@ module.exports = {
         .skip(skipValue)
         .limit(limit)
         .sort("-_id")
-        .populate("type")
-        .populate("brand");
+        .populate("brand")
+        .populate({
+          path: "typeAndChildCategory.type",
+          model: "Category",
+          select: "categoryName _id",
+        })
+        .populate({
+          path: "typeAndChildCategory.childCategories",
+          model: "Category",
+          select: "categoryName _id",
+        });
 
       const ProductSize = productsTotal.length;
 
@@ -195,7 +204,16 @@ module.exports = {
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
-        .populate("type")
+        .populate({
+          path: "typeAndChildCategory.type",
+          model: "Category",
+          select: "categoryName _id",
+        })
+        .populate({
+          path: "typeAndChildCategory.childCategories",
+          model: "Category",
+          select: "categoryName _id",
+        })
         .populate("brand");
 
       const ProductSize = productsTotal.length;
@@ -263,16 +281,34 @@ module.exports = {
           .skip(skipValue)
           .limit(limit)
           .sort("_id")
-          .populate("type")
-          .populate("brand");
-      }
+          .populate("brand")
+          .populate({
+            path: "typeAndChildCategory.type",
+            model: "Category",
+            select: "categoryName _id",
+          })
+          .populate({
+            path: "typeAndChildCategory.childCategories",
+            model: "Category",
+            select: "categoryName _id",
+          });     
+         }
       const productsTotal = await Model.Product.find();
       const products = await Model.Product.find()
         .skip(skipValue)
         .limit(limit)
         .sort("_id")
-        .populate("type")
-        .populate("brand");
+        .populate("brand")
+        .populate({
+          path: "typeAndChildCategory.type",
+          model: "Category",
+          select: "categoryName _id",
+        })
+        .populate({
+          path: "typeAndChildCategory.childCategories",
+          model: "Category",
+          select: "categoryName _id",
+        });
       const ProductSize = productsTotal.length;
 
       const result = {
@@ -342,8 +378,8 @@ module.exports = {
     }
   }),
 
-   // Get all Brands users with full details
-   getAllUserBrands: catchAsync(async (req, res, next) => {
+  // Get all Brands users with full details
+  getAllUserBrands: catchAsync(async (req, res, next) => {
     console.log("BrandDetailsis called");
     try {
       const pageNumber = parseInt(req.query.pageNumber) || 0;
@@ -367,7 +403,7 @@ module.exports = {
       const brands = await Model.Brand.find()
         .skip(skipValue)
         .limit(limit)
-        .sort("_id")
+        .sort("_id");
 
       const BrandSize = brandTotal.length;
 
@@ -379,10 +415,7 @@ module.exports = {
 
       if (BrandSize === 0) {
         // If no products are found, return a not found response
-        return responseHelper.requestfailure(
-          res,
-          "Branddetails do not exist."
-        );
+        return responseHelper.requestfailure(res, "Branddetails do not exist.");
       }
 
       // Return a success response with status code 200
@@ -393,99 +426,112 @@ module.exports = {
     }
   }),
 
-    // Get all Categories users with full details
-    getAllUserCategorys: catchAsync(async (req, res, next) => {
-      console.log("CategoryDetails is called");
-      try {
-        const pageNumber = parseInt(req.query.pageNumber) || 0;
-        const limit = parseInt(req.query.limit) || 10;
-  
-        if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
-          // If pageNumber or limit is not a valid non-negative number, return a bad request response
-          return res.badRequest("Invalid query parameters");
-          // return responseHelper.badRequest(res, "Invalid query parameters.");
-        }
-  
-        const message = "CategoryDetails found successfully";
-  
-        const skipValue = pageNumber * limit - limit;
-  
-        if (skipValue < 0) {
-          // If the calculated skip value is less than 0, return a bad request response
-          return res.badRequest("Invalid combination of pageNumber and limit.");
-        }
-        const categoryTotal = await Model.Category.find();
-        const categories = await Model.Category.find()
-          .skip(skipValue)
-          .limit(limit)
-          .sort("_id")
-  
-        const CategorySize = categoryTotal.length;
-  
-        const result = {
-          Category: categories,
-          totalCategories: CategorySize,
-          limit: limit,
-        };
-  
-        if (CategorySize === 0) {
-          // If no products are found, return a not found response
-          return responseHelper.requestfailure(
-            res,
-            "CategoryDetails do not exist."
-          );
-        }
-  
-        // Return a success response with status code 200
-        return responseHelper.success(res, result, message);
-      } catch (error) {
-        // Return a failure response with status code 500
-        responseHelper.requestfailure(res, error);
+  // Get all Categories users with full details
+  getAllUserCategorys: catchAsync(async (req, res, next) => {
+    console.log("CategoryDetails is called");
+    try {
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0) {
+        // If pageNumber or limit is not a valid non-negative number, return a bad request response
+        return res.badRequest("Invalid query parameters");
+        // return responseHelper.badRequest(res, "Invalid query parameters.");
       }
-    }),
-    getAllProductVendor: catchAsync(async (req, res, next) => {
-      console.log("Productdetails is called");
-      try {
-        const pageNumber = parseInt(req.query.pageNumber) || 0;
-        const limit = parseInt(req.query.limit) || 10;
-    
-        // Extract user ID from request parameters, adjust this based on your actual route structure
-        const userId = req.params.userId;
-    
-        if (isNaN(pageNumber) || isNaN(limit) || pageNumber < 0 || limit < 0 || !userId) {
-          return res.badRequest("Invalid query parameters");
-        }
-    
-        const message = "Productdetails found successfully";
-    
-        const skipValue = pageNumber * limit - limit;
-    
-        if (skipValue < 0) {
-          return res.badRequest("Invalid combination of pageNumber and limit.");
-        }
-    
-        // Modify the query to filter products by userId
-        const productsTotal = await Model.Product.find({ userId: userId });
-        const products = await Model.Product.find({ userId: userId })
-          .skip(skipValue)
-          .limit(limit)
-          .sort("-_id")
-          .populate("type")
-          .populate("brand");
-    
-        const productSize = productsTotal.length;
-    
-        const result = {
-          Product: products,
-          totalProducts: productSize,
-          limit: limit,
-        };
-    
-        return responseHelper.success(res, result, message);
-      } catch (error) {
-        responseHelper.requestfailure(res, error);
+
+      const message = "CategoryDetails found successfully";
+
+      const skipValue = pageNumber * limit - limit;
+
+      if (skipValue < 0) {
+        // If the calculated skip value is less than 0, return a bad request response
+        return res.badRequest("Invalid combination of pageNumber and limit.");
       }
-    }),
-    
-    
+      const categoryTotal = await Model.Category.find();
+      const categories = await Model.Category.find()
+        .skip(skipValue)
+        .limit(limit)
+        .sort("_id");
+
+      const CategorySize = categoryTotal.length;
+
+      const result = {
+        Category: categories,
+        totalCategories: CategorySize,
+        limit: limit,
+      };
+
+      if (CategorySize === 0) {
+        // If no products are found, return a not found response
+        return responseHelper.requestfailure(
+          res,
+          "CategoryDetails do not exist."
+        );
+      }
+
+      // Return a success response with status code 200
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      // Return a failure response with status code 500
+      responseHelper.requestfailure(res, error);
+    }
+  }),
+  getAllProductVendor: catchAsync(async (req, res, next) => {
+    console.log("Productdetails is called");
+    try {
+      const pageNumber = parseInt(req.query.pageNumber) || 0;
+      const limit = parseInt(req.query.limit) || 10;
+
+      // Extract user ID from request parameters, adjust this based on your actual route structure
+      const userId = req.params.userId;
+
+      if (
+        isNaN(pageNumber) ||
+        isNaN(limit) ||
+        pageNumber < 0 ||
+        limit < 0 ||
+        !userId
+      ) {
+        return res.badRequest("Invalid query parameters");
+      }
+
+      const message = "Productdetails found successfully";
+
+      const skipValue = pageNumber * limit - limit;
+
+      if (skipValue < 0) {
+        return res.badRequest("Invalid combination of pageNumber and limit.");
+      }
+
+      // Modify the query to filter products by userId
+      const productsTotal = await Model.Product.find({ userId: userId });
+      const products = await Model.Product.find({ userId: userId })
+        .skip(skipValue)
+        .limit(limit)
+        .sort("-_id")
+        .populate("brand")
+        .populate({
+          path: "typeAndChildCategory.type",
+          model: "Category",
+          select: "categoryName _id",
+        })
+        .populate({
+          path: "typeAndChildCategory.childCategories",
+          model: "Category",
+          select: "categoryName _id",
+        });
+
+      const productSize = productsTotal.length;
+
+      const result = {
+        Product: products,
+        totalProducts: productSize,
+        limit: limit,
+      };
+
+      return responseHelper.success(res, result, message);
+    } catch (error) {
+      responseHelper.requestfailure(res, error);
+    }
+  }),
 };

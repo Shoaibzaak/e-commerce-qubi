@@ -48,9 +48,17 @@ module.exports = {
         console.log("findProductById HelperFunction is called", id);
 
         const Product= await Model.Product.findById(id)
-        .populate("type")
         .populate("brand")
-        .populate("childCategory");
+        .populate({
+            path: "typeAndChildCategory.type",
+            model: "Category",
+            select: "categoryName _id",
+          })
+          .populate({
+            path: "typeAndChildCategory.childCategories",
+            model: "Category",
+            select: "categoryName _id",
+          });
 
 
 
