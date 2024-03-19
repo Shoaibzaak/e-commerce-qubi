@@ -94,7 +94,7 @@ module.exports = {
       if(req.query){
         
         let parentCategory = req.query.parentCategory
-        let subcategories = await Model.Category.find({ isDeleted: false ,parentCategory:parentCategory }).select("-_id categoryName parentCategory")
+        let subcategories = await Model.Category.find({ isDeleted: false ,parentCategory:parentCategory }).select("_id categoryName parentCategory")
         .populate({
           path: "parentCategory",
           select: "_id categoryName",
@@ -127,6 +127,7 @@ module.exports = {
 
       const parentCategories = await Model.Category.find({ isDeleted: false,parentCategory:null })
         .sort("-_id")
+        .select("_id categoryName ")
       const CategorySize = parentCategories.length;
 
       const result = {
