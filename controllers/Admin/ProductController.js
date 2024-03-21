@@ -291,8 +291,8 @@ module.exports = {
             path: "typeAndChildCategory.childCategories",
             model: "Category",
             select: "categoryName _id",
-          });     
-         }
+          });
+      }
       const productsTotal = await Model.Product.find();
       const products = await Model.Product.find()
         .skip(skipValue)
@@ -532,6 +532,55 @@ module.exports = {
       return responseHelper.success(res, result, message);
     } catch (error) {
       responseHelper.requestfailure(res, error);
+    }
+  }),
+  updateProfileImage: catchAsync(async (req, res, next) => {
+    try {
+      console.log("updateImage has been called");
+      const { id } = req.params;
+      const files = req.files.images;
+
+      // Check if files (images) exist
+      if (files && files.length > 0) {
+        for (const file of files) {
+          const { path } = file;
+          const newPath = await cloudUpload.cloudinaryUpload(path);
+          // Find the product by id
+          const product = await Model.Product.findById(id);
+          if (!product) {
+            throw new HTTPError(Status.NOT_FOUND, "Product not found");
+          }
+
+          // Check if the product has images array
+          if (!product.images) {
+            product.images = [];
+          }
+
+          // Update the image at specific index or push new image if index is not provided
+          if (
+            req.body.index !== undefined &&
+            req.body.index < product.images.length
+          ) {
+            product.images[req.body.index] = newPath;
+          } else {
+            product.images.push(newPath);
+          }
+
+          // Save the updated product
+          await product.save();
+        }
+      }
+
+      const updatedProduct = await Model.Product.findById(id);
+
+      if (!updatedProduct) {
+        throw new HTTPError(Status.NOT_FOUND, "Product not found");
+      }
+
+      const message = "Product status updated successfully";
+      res.ok(message, updatedProduct);
+    } catch (err) {
+      next(err); // Pass the error to the next middleware for centralized error handling
     }
   }),
 };

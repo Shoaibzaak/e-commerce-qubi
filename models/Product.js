@@ -95,6 +95,7 @@ const productModel = new Schema(
     size: {
       type: String,
       enum: ["Small", "Medium", "Large"],
+      default:"Medium"
     },
     // Allow for additional attributes dynamically
     customAttributes: {

@@ -56,6 +56,17 @@ router.route("/updateProduct").post(
   Authentication.AdminAuth,
   Controller.ProductController.updateProduct
 );
+//update Profile Pic
+router.route("/updateProfilePic/:id").put(
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 10,
+    },
+  ]),
+  // Authentication.AdminAuth,
+  Controller.ProductController.updateProfileImage
+);
 
 //delete Product
 router
