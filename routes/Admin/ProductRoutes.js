@@ -64,7 +64,7 @@ router.route("/updateProfilePic/:id").put(
       maxCount: 10,
     },
   ]),
-  // Authentication.AdminAuth,
+  Authentication.AdminAuth,
   Controller.ProductController.updateProfileImage
 );
 
