@@ -337,14 +337,33 @@ module.exports = {
       const ProductUserData = req.body;
       const files = req.files.images;
 
-      // Check if files (images) exist
       if (files && files.length > 0) {
-        ProductUserData.images = [];
-
         for (const file of files) {
           const { path } = file;
           const newPath = await cloudUpload.cloudinaryUpload(path);
-          ProductUserData.images.push(newPath);
+          // Find the product by id
+          const product = await Model.Product.findById(id);
+          if (!product) {
+            throw new HTTPError(Status.NOT_FOUND, "Product not found");
+          }
+
+          // Check if the product has images array
+          if (!product.images) {
+            product.images = [];
+          }
+
+          // Update the image at specific index or push new image if index is not provided
+          if (
+            req.body.index !== undefined &&
+            req.body.index < product.images.length
+          ) {
+            product.images[req.body.index] = newPath;
+          } else {
+            product.images.push(newPath);
+          }
+
+          // Save the updated product
+          await product.save();
         }
       }
       const updatedProduct = await Model.Product.findOneAndUpdate(
