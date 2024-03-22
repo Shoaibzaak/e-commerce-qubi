@@ -342,7 +342,7 @@ module.exports = {
           const { path } = file;
           const newPath = await cloudUpload.cloudinaryUpload(path);
           // Find the product by id
-          const product = await Model.Product.findById(id);
+          const product = await Model.Product.findById({ _id: ProductUserData.ProductId });
           if (!product) {
             throw new HTTPError(Status.NOT_FOUND, "Product not found");
           }
