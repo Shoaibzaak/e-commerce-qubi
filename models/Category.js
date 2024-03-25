@@ -39,7 +39,6 @@ categoryModel.set("toJSON", {
 });
 
 categoryModel.methods.customUpdate = async function (updateFields) {
-  console.log("middleware is calling there====>");
   try {
     const categoryId = this._id;
     console.log(categoryId, "categoryId");
