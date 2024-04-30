@@ -55,8 +55,8 @@ web_modules/
 # Optional eslint cache
 .eslintcache
 # dotenv environment variables file
-.env
-.env.test
+# .env
+# .env.test
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
